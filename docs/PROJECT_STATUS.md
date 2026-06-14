@@ -4,8 +4,8 @@
 
 - 最終更新日：2026-06-14
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` から、優先未リリース2コミット検証用ブランチ `integrate/upstream-v0.15.0-fixes` を作成し、CI修正とLIFFセキュリティ修正の検証を完了。
-- 次の主要目標：検証済み優先2コミットの `custom/main` 取り込み判断と、改造版初期差分の設計。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）を正式取り込み済み。残り2コミットの設計整合性調査を完了。
+- 次の主要目標：残り2コミットの取り込み判断と、改造版初期差分の設計。
 
 ## 現在のゴール
 
@@ -38,17 +38,19 @@
 - [x] 管理資料とAGENTS.mdを `custom/main` へcommitし、`origin/custom/main` へpush
 - [x] 優先CI修正 `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01` の検証を完了
 - [x] LIFFセキュリティ修正 `e2689ba3228cf3a8074b1edf6cf4f260502a70b3` を検証用ブランチへcherry-pickし、検証を完了
+- [x] 検証済み優先2コミットと検証記録を `custom/main` へ正式取り込みし、`origin/custom/main` へpush
+- [x] 残り2コミット `a0a9c60849e5b25c030b6d40e514f5242721dac1` と `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` の設計整合性を調査
 
 ## 現在進行中の作業
 
-- [ ] 検証済み優先2コミットの `custom/main` 取り込み判断
+- [ ] 残り2コミットの取り込み判断
 - [ ] 改造版初期差分の設計
 
 ## 次に行う作業
 
-1. `integrate/upstream-v0.15.0-fixes` の検証結果を確認し、`custom/main` へ取り込むか決定する
-2. 取り込む場合は、`custom/main` へのmergeまたはcherry-pick方針を決める
-3. 残り2コミット `a0a9c60849e5b25c030b6d40e514f5242721dac1` と `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` の取り込み要否を設計整合込みで判断する
+1. Admin build fingerprint `a0a9c60849e5b25c030b6d40e514f5242721dac1` を取り込むか決定する
+2. Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を、`docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新と合わせて取り込むか決定する
+3. 取り込む場合は、個別検証用ブランチを作り、1件ずつcherry-pickしてAdmin/Worker関連のtest・typecheck・buildを実行する
 4. `packages/create-line-harness` の変更対象を確定する
 
 ## 現在のローカル環境
@@ -65,7 +67,7 @@
 ## Git・GitHubの状態
 
 - Git初期化：済み
-- 現在のブランチ：`integrate/upstream-v0.15.0-fixes`
+- 現在のブランチ：`custom/main`
 - origin：`https://github.com/mooyama1701-sketch/line-harness-oss-custom.git`
 - upstream：`https://github.com/Shudesu/line-harness-oss.git`
 - GitHub CLI認証：有効。アクティブアカウントは `mooyama1701-sketch`。Git操作プロトコルは `https`。
@@ -75,7 +77,7 @@
 - Fork元：`Shudesu/line-harness-oss`
 - 正式作業場所：`/Users/mooyama/codex/LINE-Harness-oss-Custom`
 - バックアップ先：`/Users/mooyama/codex/LINE-Harness-oss-Custom-backup-20260614`
-- clone先の現在ブランチ：`integrate/upstream-v0.15.0-fixes`
+- clone先の現在ブランチ：`custom/main`
 - clone先の作業ツリー：clean
 - clone先のorigin：`https://github.com/mooyama1701-sketch/line-harness-oss-custom.git`
 - clone先のupstream：`https://github.com/Shudesu/line-harness-oss.git`
@@ -84,7 +86,8 @@
 - 作成済みローカルブランチ：`custom/main`
 - `custom/main` の起点：`1515a74cbe2f7154fdb09ad2f370e743ed8421a6`
 - 作成済み検証ブランチ：`integrate/upstream-v0.15.0-fixes`
-- `integrate/upstream-v0.15.0-fixes` の現在コミット：`8876457b8a0691d6b32dec57a4c5a977a1c186e6`
+- `custom/main` の現在コミット：`273caf2233f64653eac4be15ab68869d39c8189f`
+- `integrate/upstream-v0.15.0-fixes` の現在コミット：`273caf2233f64653eac4be15ab68869d39c8189f`
 - 評価済み未リリースコミット：
   - `a0a9c60849e5b25c030b6d40e514f5242721dac1`
   - `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01`
@@ -133,7 +136,7 @@
 
 ## 次回Codexへ依頼する作業
 
-`integrate/upstream-v0.15.0-fixes` の優先未リリース2コミット検証結果を確認し、`custom/main` へ取り込むか決定してください。CI修正とLIFFセキュリティ修正はいずれも検証済みです。Workerテストの前回失敗は、workflowと同じ事前buildを実行していなかったことによる `@line-crm/shared` dist不足と切り分け済みです。
+残り2コミットの取り込み可否を決定してください。設計整合性調査では、Admin build fingerprint `a0a9c60849e5b25c030b6d40e514f5242721dac1` は「そのまま取り込む」推奨、Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` は「修正して取り込む」推奨です。後者はコミット本体に加えて `docs/FORK_CLOUDFLARE_WORKFLOW.md` のrepo Variables一覧へ `ADMIN_ORIGIN` / `ADMIN_ALLOW_CROSS_SITE` / `WORKER_URL` を追記するのが望ましいです。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 
@@ -162,3 +165,17 @@
 
 - `pnpm --filter worker build` 実行時、Wranglerが `/Users/mooyama/Library/Preferences/.wrangler/logs/` へログを書けない `EPERM` 警告を出したが、コマンドの終了コードは0で、ビルド自体は成功。
 - lockfileや想定外のソースファイル変更は発生していない。
+
+## 残り2コミット設計整合性調査結果（2026-06-14）
+
+| コミット | 評価 | 理由 |
+|---|---|---|
+| `a0a9c60849e5b25c030b6d40e514f5242721dac1` | そのまま取り込む推奨 | Adminサイドバーにcommit SHAとbuild時刻を表示し、問い合わせ時のデプロイ元判別に有用。インストーラー設計と直接衝突しない。将来のブランド調整時に `L Harness` 表示名は再確認する。 |
+| `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` | 修正して取り込む推奨 | GitHub Actions deployでAdmin CORS varsを毎回wrangler configへ注入し、redeployで設定が落ちる事故を防ぐ。インストーラーのsecrets方式とは責務が別で両立可能。ただしFork運用資料のVariables一覧更新が必要。 |
+
+推奨順序：
+
+1. `a0a9c60849e5b25c030b6d40e514f5242721dac1`
+2. `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` + `docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新
+
+今回の調査では、cherry-pick、merge、ブランチ作成、ソースコード修正、workflow修正、Cloudflare操作、npm操作は行っていない。

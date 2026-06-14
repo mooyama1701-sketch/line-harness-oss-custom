@@ -509,3 +509,124 @@ pnpm --filter @line-crm/shared --filter @line-crm/line-sdk --filter @line-crm/db
 - 残り2コミットの取り込み
 - テスト失敗に対する独自修正
 - 本番環境操作
+
+---
+
+## 残り2コミットの設計整合性調査
+
+調査日：2026-06-14
+
+対象コミット：
+
+| コミット | 件名 |
+|---|---|
+| `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` | `feat(ci): bake admin CORS vars into deploy config so they survive redeploys (#165)` |
+| `a0a9c60849e5b25c030b6d40e514f5242721dac1` | `fix: show admin build fingerprint (#157)` |
+
+照合した資料・実装：
+
+- `docs/INSTALLER_ARCHITECTURE.md`
+- `docs/DECISIONS.md`
+- `docs/PROJECT_STATUS.md`
+- `.github/workflows/deploy-cloudflare-worker.yml`
+- `.github/workflows/deploy-cloudflare-admin.yml`
+- `.github/workflows/release.yml`
+- `apps/worker/wrangler.toml`
+- `packages/create-line-harness/src/steps/admin-auth.ts`
+- `packages/create-line-harness/src/steps/deploy-admin.ts`
+- `packages/create-line-harness/src/lib/installed-wrangler.ts`
+- `apps/web/next.config.ts`
+- `apps/web/src/components/layout/sidebar.tsx`
+- `docs/ADMIN-AUTH.md`
+- `docs/FORK_CLOUDFLARE_WORKFLOW.md`
+- `docs/OSS-SYNC-CHARTER.md`
+
+### 現在のAdmin CORS設定
+
+現状：
+
+- `apps/worker/wrangler.toml` の `[vars]` には `ADMIN_ORIGIN` / `ADMIN_ALLOW_CROSS_SITE` / `WORKER_URL` は入っていない。
+- `deploy-cloudflare-worker.yml` は `dist/line_harness/wrangler.json` の `account_id`、D1 name、D1 IDだけをpatchしてdeployする。
+- `create-line-harness` の初期構築では、`packages/create-line-harness/src/steps/admin-auth.ts` が `ADMIN_ORIGIN`、`ADMIN_ALLOW_CROSS_SITE=true`、必要に応じて `WORKER_URL` をWorker secretsとして登録する。
+- `apps/worker/src/middleware/admin-auth-config.ts` は `ADMIN_ORIGIN` allowlistと `ADMIN_ALLOW_CROSS_SITE` を使い、Pages `*.pages.dev` と Workers `*.workers.dev` のcross-site cookie設定を判定する。
+
+`1c4adffc...` 取り込み後：
+
+- GitHub Actions deploy時に、repo Variables `ADMIN_ORIGIN`、`ADMIN_ALLOW_CROSS_SITE`、`WORKER_URL` を `dist/line_harness/wrangler.json` の `vars` へ注入する。
+- `ADMIN_ORIGIN` が未設定ならno-opで、既存のsame-site構成には影響しない。
+- `ADMIN_ORIGIN` 設定時、`ADMIN_ALLOW_CROSS_SITE` は未指定なら `"true"` として注入される。
+- Cloudflare Dashboardで手動設定したplain Worker variablesが、wrangler deployで落ちてAdmin loginが壊れる事故を避けられる。
+
+整理：
+
+| 観点 | 現状 | `1c4adffc...` 取り込み後 |
+|---|---|---|
+| インストーラー初期構築 | Worker secretsとしてAdmin CORSを登録 | 変更なし |
+| Fork + GitHub Actions deploy | repo VariablesにはAdmin CORS項目がなく、手動dashboard varsはredeployで落ちる可能性あり | repo Variablesから毎回wrangler configへ注入 |
+| secretsとの関係 | インストーラーはsecrets方式 | GitHub Actionsはvars方式。値はAdmin URL、Worker URL、booleanで秘密情報ではない |
+| same-site構成 | `ADMIN_ORIGIN` 未設定ならLax寄り | `ADMIN_ORIGIN` 未設定ならno-op |
+| cross-site Pages↔Workers | 手動設定またはインストーラー設定が必要 | GitHub Actions運用でも再deploy耐性が上がる |
+
+### `1c4adffc...` 評価
+
+| 項目 | 評価 |
+|---|---|
+| 変更目的 | Fork利用者のGitHub Actions Worker deployで、Admin CORS関連varsを毎回deploy configへ焼き込み、redeployで設定が落ちる事故を防ぐ。 |
+| 変更ファイル | `.github/workflows/deploy-cloudflare-worker.yml`, `docs/ADMIN-AUTH.md` |
+| メリット | Fork運用でAdmin loginがCORSエラーになる事故を防げる。Dashboard手動varsに依存しない。`ADMIN_ORIGIN` 未設定時はno-op。 |
+| インストーラー設計との整合性 | 初期インストーラーはWorker secretsでAdmin CORSを設定するため責務は別。GitHub Actions運用の補強として整合する。 |
+| カスタマイズ版との衝突点 | 初期リリースがnpxインストーラー中心で、GitHub Actions deployを主導線にしない場合は優先度がやや下がる。ただしFork方式採用とは整合する。 |
+| セキュリティ・運用上の注意 | `ADMIN_ORIGIN` は正確なadmin originを設定する必要がある。`ADMIN_ALLOW_CROSS_SITE=true` はSameSite=None cookieを使うため、長期的にはsame-site custom domain推奨。`WORKER_URL` は公開URLでありsecretではない。 |
+| そのまま取り込み可能か | 可能。GitHub Actions上の `jq` 利用はubuntu runner前提では問題になりにくい。 |
+| 修正して取り込むべきか | 取り込み後に `docs/FORK_CLOUDFLARE_WORKFLOW.md` のVariables一覧へ `ADMIN_ORIGIN` / `ADMIN_ALLOW_CROSS_SITE` / `WORKER_URL` を追記するのが望ましい。 |
+| 推奨判断 | 修正して取り込む。コミット本体はそのまま取り込み、改造版のFork運用資料を追加更新する。 |
+
+### build fingerprintの表示場所と用途
+
+現状：
+
+- `apps/web/next.config.ts` はroot `package.json` から `APP_VERSION` だけをAdmin buildへ注入する。
+- `apps/web/src/components/layout/sidebar.tsx` のフッターに `L Harness v{APP_VERSION}` だけを表示する。
+
+`a0a9c60...` 取り込み後：
+
+- `apps/web/next.config.ts` が `APP_COMMIT_SHA` と `APP_BUILD_TIME` もAdmin buildへ注入する。
+- `APP_COMMIT_SHA` は `APP_COMMIT_SHA` env、`GITHUB_SHA`、`CF_PAGES_COMMIT_SHA`、ローカル `git rev-parse HEAD`、最後に `local` の順で決まる。
+- `APP_BUILD_TIME` はworkflowでUTC時刻を渡す。env未指定時はbuild時点の `new Date().toISOString()`。
+- `apps/web/src/components/layout/sidebar.tsx` のフッターに `build <sha> · <UTC time>` が表示される。
+
+用途：
+
+- Admin画面のスクリーンショットだけで、どのcommitからbuildされた管理画面か判別できる。
+- 問い合わせ・不具合調査時に、利用者のAdminが想定commitを反映しているか確認しやすい。
+- release bundleやPages deployのAdmin成果物が、どの時刻・commit由来か追いやすい。
+
+### `a0a9c60...` 評価
+
+| 項目 | 評価 |
+|---|---|
+| 変更目的 | Admin画面にversionだけでなくcommit SHAとbuild時刻を表示し、デプロイ元を判別しやすくする。 |
+| 変更ファイル | `.github/workflows/deploy-cloudflare-admin.yml`, `.github/workflows/release.yml`, `apps/web/next.config.ts`, `apps/web/src/components/layout/sidebar.tsx`, `docs/OSS-SYNC-CHARTER.md` |
+| メリット | 問い合わせ対応、配布版判別、release bundle検証がしやすい。root `package.json` / `pnpm-lock.yaml` 変更でもAdmin deployが走るようになる。 |
+| インストーラー設計との整合性 | 初期インストーラーの新規構築方針とは直接衝突しない。Admin buildは `create-line-harness` の `deployAdmin` でも実行されるが、gitが取れない環境では `local` fallbackがありbuild不能にはなりにくい。 |
+| カスタマイズ版との衝突点 | 表示文言が `L Harness` のままなので、将来の改造版ブランド調整時に合わせて直す必要がある。build時刻をデフォルト生成するため、ローカルbuildは完全再現性が少し下がる。 |
+| セキュリティ・運用上の注意 | commit SHAとbuild時刻は秘密情報ではないが、公開Adminに内部commit識別子を表示する運用になる。第三者配布ではサポートには有用。隠したい場合は別途表示方針を決める。 |
+| そのまま取り込み可能か | 可能。ただしブランド文言は改造版UI調整時に再確認する。 |
+| 修正して取り込むべきか | コミット本体はそのまま取り込み可能。追加で `docs/OSS-SYNC-CHARTER.md` の内容が公式運用寄りである点を、改造版運用資料と混同しないよう後で整理するとよい。 |
+| 推奨判断 | そのまま取り込む。UIブランド調整時に表示名だけ再評価する。 |
+
+### 推奨する取り込み順序
+
+1. `a0a9c60849e5b25c030b6d40e514f5242721dac1`
+   - 理由：Admin build fingerprintは独立性が高く、CORS workflow変更との依存がない。先に取り込むと、以後のAdmin build成果物判別にも役立つ。
+2. `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c`
+   - 理由：Worker deploy workflowのCORS vars注入はFork運用資料の追加更新と合わせたい。`docs/FORK_CLOUDFLARE_WORKFLOW.md` のVariables一覧更新を同時に行うのが望ましい。
+
+### 総合判断
+
+| コミット | 推奨判断 | 理由 |
+|---|---|---|
+| `a0a9c60849e5b25c030b6d40e514f5242721dac1` | そのまま取り込む | Admin成果物の判別性が上がり、インストーラー設計と直接衝突しない。 |
+| `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` | 修正して取り込む | コミット本体は整合するが、改造版のFork運用資料へrepo Variables追記が必要。 |
+
+今回の調査では、cherry-pick、merge、ブランチ作成、ソースコード修正、workflow修正、Cloudflare操作、npm操作は行っていない。
