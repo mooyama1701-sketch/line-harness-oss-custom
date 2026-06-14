@@ -67,6 +67,15 @@ Variables:
 | `VITE_LIFF_ID` | LIFF ID |
 | `VITE_BOT_BASIC_ID` | LINE bot basic ID |
 | `VITE_CALENDAR_CONNECTION_ID` | Google Calendar 連携を使う場合だけ設定 |
+| `ADMIN_ORIGIN` | Admin 画面の公開 URL。例：`https://your-admin.pages.dev` |
+| `ADMIN_ALLOW_CROSS_SITE` | Admin と Worker が異なる site 間で Cookie を使う場合は `true`。未設定時は Worker deploy workflow 側で `true` |
+| `WORKER_URL` | Worker の公開 URL。例：`https://your-worker.your-subdomain.workers.dev`。必要な構成で設定する任意値 |
+
+`ADMIN_ORIGIN` は、Worker が許可する Admin Origin として使います。Pages と Workers の標準的な組み合わせでは cross-site Cookie が必要になるため、Fork から GitHub Actions で Worker を再 deploy する場合は、`ADMIN_ORIGIN` と `ADMIN_ALLOW_CROSS_SITE=true` の設定を推奨します。同一 site 構成など、明確な理由がある場合だけ `ADMIN_ALLOW_CROSS_SITE=false` を検討してください。
+
+これらの値は通常 API token や秘密鍵ではないため、GitHub Actions Variables として管理します。`CLOUDFLARE_API_TOKEN` などの認証情報は、引き続き Secrets で管理してください。
+
+npx インストーラー経由の新規構築では、Admin CORS 関連値を Worker secrets として設定します。一方、Fork から GitHub Actions で再 deploy する場合は、repo Variables に同じ運用値を登録してください。Cloudflare Dashboard だけに plain vars を設定しても、workflow による `wrangler deploy` で維持されない可能性があります。
 
 Worker secrets は Cloudflare 側へ入れます。
 
