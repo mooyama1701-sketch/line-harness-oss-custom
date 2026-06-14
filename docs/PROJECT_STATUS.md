@@ -4,8 +4,8 @@
 
 - 最終更新日：2026-06-14
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` と、優先未リリースコミット検証用ブランチ `integrate/upstream-v0.15.0-fixes` を作成済み。
-- 次の主要目標：優先未リリース2コミットの検証再開と、改造版初期差分の設計。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` から、優先未リリース2コミット検証用ブランチ `integrate/upstream-v0.15.0-fixes` を作成し、CI修正とLIFFセキュリティ修正の検証を完了。
+- 次の主要目標：検証済み優先2コミットの `custom/main` 取り込み判断と、改造版初期差分の設計。
 
 ## 現在のゴール
 
@@ -35,18 +35,21 @@
 - [x] 優先CI修正 `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01` を検証用ブランチへcherry-pick
 - [x] 開発用リポジトリと管理資料用フォルダを `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合
 - [x] 統合前の管理資料用フォルダを `/Users/mooyama/codex/LINE-Harness-oss-Custom-backup-20260614` として保持
+- [x] 管理資料とAGENTS.mdを `custom/main` へcommitし、`origin/custom/main` へpush
+- [x] 優先CI修正 `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01` の検証を完了
+- [x] LIFFセキュリティ修正 `e2689ba3228cf3a8074b1edf6cf4f260502a70b3` を検証用ブランチへcherry-pickし、検証を完了
 
 ## 現在進行中の作業
 
-- [ ] 優先未リリース2コミットの検証完了
+- [ ] 検証済み優先2コミットの `custom/main` 取り込み判断
 - [ ] 改造版初期差分の設計
 
 ## 次に行う作業
 
-1. `integrate/upstream-v0.15.0-fixes` で停止中の検証を再開する
-2. Workerテスト失敗原因を、独自修正せずに前提build不足か実不具合か切り分ける
-3. 問題がなければセキュリティ修正 `e2689ba3228cf3a8074b1edf6cf4f260502a70b3` をcherry-pickして検証する
-4. `packages/create-line-harness` の変更対象を確定
+1. `integrate/upstream-v0.15.0-fixes` の検証結果を確認し、`custom/main` へ取り込むか決定する
+2. 取り込む場合は、`custom/main` へのmergeまたはcherry-pick方針を決める
+3. 残り2コミット `a0a9c60849e5b25c030b6d40e514f5242721dac1` と `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` の取り込み要否を設計整合込みで判断する
+4. `packages/create-line-harness` の変更対象を確定する
 
 ## 現在のローカル環境
 
@@ -81,7 +84,7 @@
 - 作成済みローカルブランチ：`custom/main`
 - `custom/main` の起点：`1515a74cbe2f7154fdb09ad2f370e743ed8421a6`
 - 作成済み検証ブランチ：`integrate/upstream-v0.15.0-fixes`
-- `integrate/upstream-v0.15.0-fixes` の現在コミット：`d06e26c171c1fa499de56fd997a73fbcbe8cd8b5`
+- `integrate/upstream-v0.15.0-fixes` の現在コミット：`8876457b8a0691d6b32dec57a4c5a977a1c186e6`
 - 評価済み未リリースコミット：
   - `a0a9c60849e5b25c030b6d40e514f5242721dac1`
   - `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01`
@@ -130,4 +133,32 @@
 
 ## 次回Codexへ依頼する作業
 
-`integrate/upstream-v0.15.0-fixes` で優先未リリース2コミットの検証を再開してください。現時点ではCI修正 `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01` はcherry-pick済みですが、Workerテストが `@line-crm/shared` のdist解決失敗で停止しています。セキュリティ修正 `e2689ba3228cf3a8074b1edf6cf4f260502a70b3` は未適用です。
+`integrate/upstream-v0.15.0-fixes` の優先未リリース2コミット検証結果を確認し、`custom/main` へ取り込むか決定してください。CI修正とLIFFセキュリティ修正はいずれも検証済みです。Workerテストの前回失敗は、workflowと同じ事前buildを実行していなかったことによる `@line-crm/shared` dist不足と切り分け済みです。
+
+## 優先未リリース2コミット検証結果（2026-06-14）
+
+検証ブランチ：`integrate/upstream-v0.15.0-fixes`
+
+| 項目 | 結果 |
+|---|---|
+| Node.js | `v20.20.2` |
+| pnpm | `9.15.4` |
+| 依存関係 | `node_modules` 存在確認済み。追加installなし |
+| 1件目 | `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01` を適用済み。rebase後コミットは `d25eb07275f12237178887b9cb715e005a0fac0f` |
+| 2件目 | `e2689ba3228cf3a8074b1edf6cf4f260502a70b3` を競合なしでcherry-pick。検証ブランチ上コミットは `8876457b8a0691d6b32dec57a4c5a977a1c186e6` |
+| Workerテスト失敗原因 | 前回失敗は、実装不具合ではなく、workflowと同じ事前buildを行っていなかったことによる `@line-crm/shared` dist不足と判断 |
+| 取り込み判断 | 検証上は `custom/main` へ取り込み可能。ただしmerge/pushは未実施 |
+
+実行した検証：
+
+- `pnpm --filter @line-crm/shared --filter @line-crm/line-sdk --filter @line-crm/db --filter @line-harness/update-engine build`：成功
+- `pnpm --filter worker typecheck`：成功
+- `pnpm --filter worker test`：成功（1件目検証時：45 files / 511 tests、2件目適用後：46 files / 520 tests）
+- `pnpm --filter worker build`：成功
+- `pnpm --filter worker test -- src/lib/safe-redirect.test.ts`：成功（1 file / 9 tests）
+- `pnpm --filter liff build`：成功
+
+補足：
+
+- `pnpm --filter worker build` 実行時、Wranglerが `/Users/mooyama/Library/Preferences/.wrangler/logs/` へログを書けない `EPERM` 警告を出したが、コマンドの終了コードは0で、ビルド自体は成功。
+- lockfileや想定外のソースファイル変更は発生していない。

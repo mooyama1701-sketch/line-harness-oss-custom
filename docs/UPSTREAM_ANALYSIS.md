@@ -411,4 +411,101 @@
 | 中 | `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` | Fork運用時のAdmin CORS設定維持に有用。ただしインストーラー設計との整合確認が必要。 |
 | 中 | `a0a9c60849e5b25c030b6d40e514f5242721dac1` | ビルド判別性向上に有用。ただしUIブランド調整と合わせて取り込む方がよい。 |
 
-今回の評価では、4コミットすべてを「不要」ではなく取り込み候補と判断します。ただし、今回は未リリースコミットのcherry-pick・mergeは実施していません。
+今回の評価では、4コミットすべてを「不要」ではなく取り込み候補と判断します。ただし、この時点では未リリースコミットのcherry-pick・mergeは実施していません。
+
+---
+
+## 優先未リリース2コミットの取り込み検証
+
+検証日：2026-06-14
+
+検証ブランチ：
+
+```text
+integrate/upstream-v0.15.0-fixes
+```
+
+基準：
+
+```text
+custom/main
+62b5f2691b22c6eeec313ac9cfbd1019fd6e9cfe
+docs: consolidate project guidance and management documents
+```
+
+検証対象：
+
+| 順序 | 元コミット | 検証ブランチ上のコミット | 件名 |
+|---|---|---|---|
+| 1 | `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01` | `d25eb07275f12237178887b9cb715e005a0fac0f` | `fix(ci): build @line-harness/update-engine before worker in deploy workflow (#164)` |
+| 2 | `e2689ba3228cf3a8074b1edf6cf4f260502a70b3` | `8876457b8a0691d6b32dec57a4c5a977a1c186e6` | `fix(liff): guard /auth/line redirect against dangerous schemes (#163)` |
+
+### 検証環境
+
+| 項目 | 値 |
+|---|---|
+| Node.js | `v20.20.2` |
+| pnpm | `9.15.4` |
+| 依存関係 | `node_modules` 存在確認済み。追加installなし |
+
+### 1件目：Worker deploy workflowの事前build修正
+
+変更内容：
+
+- `.github/workflows/deploy-cloudflare-worker.yml` のWorker deploy前build対象へ `@line-harness/update-engine` を追加。
+- 実際のworkflowでは `pnpm install --frozen-lockfile` 後、以下をWorker build前に実行する。
+
+```bash
+pnpm --filter @line-crm/shared --filter @line-crm/line-sdk --filter @line-crm/db --filter @line-harness/update-engine build
+```
+
+検証コマンドと結果：
+
+| コマンド | 結果 |
+|---|---|
+| `pnpm --filter @line-crm/shared --filter @line-crm/line-sdk --filter @line-crm/db --filter @line-harness/update-engine build` | 成功 |
+| `pnpm --filter worker typecheck` | 成功 |
+| `pnpm --filter worker test` | 成功。45 files / 511 tests |
+| `pnpm --filter worker build` | 成功 |
+
+前回のWorkerテスト失敗原因の切り分け：
+
+- 前回は `@line-crm/shared` のpackage entry解決に失敗していた。
+- workflowと同じ事前buildを実行した後はWorkerテストが成功した。
+- そのため、前回失敗は実装不具合ではなく、`@line-crm/shared` などworkspace依存のdist未生成、つまり事前build不足と判断する。
+
+補足：
+
+- `pnpm --filter worker build` 実行時にWranglerが `/Users/mooyama/Library/Preferences/.wrangler/logs/` へログを書けない `EPERM` 警告を出した。
+- ただし終了コードは0で、Vite build成果物は生成されているため、ビルド自体は成功として扱う。
+
+### 2件目：LIFF redirect安全化
+
+変更内容：
+
+- `apps/worker/src/lib/safe-redirect.ts` を追加し、`redirect` パラメータを検証。
+- `apps/worker/src/lib/safe-redirect.test.ts` を追加。
+- `apps/worker/src/routes/liff.ts` のserver側 `/auth/callback` redirectへ適用。
+- `apps/worker/src/client/main.ts` のclient側LIFF navigationへ適用。
+
+検証コマンドと結果：
+
+| コマンド | 結果 |
+|---|---|
+| `pnpm --filter worker test -- src/lib/safe-redirect.test.ts` | 成功。1 file / 9 tests |
+| `pnpm --filter worker typecheck` | 成功 |
+| `pnpm --filter worker build` | 成功 |
+| `pnpm --filter liff build` | 成功 |
+| `pnpm --filter worker test` | 成功。46 files / 520 tests |
+
+### 取り込み判断
+
+検証上は、優先2コミットを `custom/main` へ取り込み可能と判断する。
+
+ただし、今回の作業では以下を行っていない。
+
+- `custom/main` へのmerge
+- 検証ブランチのpush
+- 残り2コミットの取り込み
+- テスト失敗に対する独自修正
+- 本番環境操作
