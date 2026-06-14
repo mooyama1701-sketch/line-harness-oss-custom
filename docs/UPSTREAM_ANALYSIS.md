@@ -630,3 +630,77 @@ pnpm --filter @line-crm/shared --filter @line-crm/line-sdk --filter @line-crm/db
 | `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` | 修正して取り込む | コミット本体は整合するが、改造版のFork運用資料へrepo Variables追記が必要。 |
 
 今回の調査では、cherry-pick、merge、ブランチ作成、ソースコード修正、workflow修正、Cloudflare操作、npm操作は行っていない。
+
+---
+
+## Admin build fingerprint検証結果
+
+検証日：2026-06-14
+
+対象コミット：
+
+| コミット | 件名 | 検証ブランチ上のcommit |
+|---|---|---|
+| `a0a9c60849e5b25c030b6d40e514f5242721dac1` | `fix: show admin build fingerprint (#157)` | `cf23efd5a00b...` |
+
+検証ブランチ：
+
+- `validate/upstream-a0a9c60-build-fingerprint`
+
+cherry-pick結果：
+
+- 専用検証ブランチで対象コミットだけをcherry-pickした。
+- 競合なしで成功した。
+- ローカルcommitは `cf23efd5a00b...` になった。
+
+変更対象ファイル：
+
+- `.github/workflows/deploy-cloudflare-admin.yml`
+- `.github/workflows/release.yml`
+- `apps/web/next.config.ts`
+- `apps/web/src/components/layout/sidebar.tsx`
+- `docs/OSS-SYNC-CHARTER.md`
+
+Build Fingerprintに表示される情報：
+
+- root `package.json` のversion
+- short commit SHA
+- build時刻
+
+commit SHAの取得優先順位：
+
+1. `APP_COMMIT_SHA`
+2. `GITHUB_SHA`
+3. `CF_PAGES_COMMIT_SHA`
+4. `git rev-parse HEAD`
+5. `local`
+
+build時刻の取得方法：
+
+- `APP_BUILD_TIME`
+- 未指定時は `new Date().toISOString()`
+
+検証コマンドと結果：
+
+| コマンド | 結果 |
+|---|---|
+| `pnpm --filter web test` | 成功。2 files / 8 tests passed |
+| `pnpm --filter web build` | `NEXT_PUBLIC_API_URL` 未設定で失敗。既存仕様による失敗で、Build Fingerprint起因ではない |
+| `NEXT_PUBLIC_API_URL=https://worker.example.test pnpm --filter web build` | 成功 |
+| `APP_COMMIT_SHA=1234567 APP_BUILD_TIME=2026-06-14T12:34:56Z NEXT_PUBLIC_API_URL=https://worker.example.test pnpm --filter web build` | 成功 |
+| `NEXT_PUBLIC_API_URL=https://worker.example.test pnpm deploy:web` | 成功 |
+
+確認結果：
+
+- 環境変数あり・なしのbuildはいずれも成功した。
+- 環境変数ありbuildでは、生成物にversion、`1234567`、`2026-06-14T12:34:56Z` が反映された。
+- 環境変数なしbuildでは、commit SHAはGit情報から取得され、build時刻はbuild時のISO時刻へfallbackした。
+- Cloudflare Pages向けbuildとの整合性に問題は見つからなかった。
+- GitHub Actions workflowに不要な権限追加、secret追加、deploy先やbranch条件の意図しない変更はなかった。
+- 表示情報はversion、commit SHA、build時刻であり、秘密情報漏えいの懸念は低い。
+- ローカル実画面プレビューは未実施。AdminはAPI URLとログイン状態に依存するため、今回はbuild成果物と差分で確認した。
+- `L Harness` 表示は今回は変更しない。将来の改造版ブランド確定時に再確認する。
+
+最終評価：
+
+- そのまま正式取り込み可能。

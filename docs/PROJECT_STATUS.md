@@ -4,8 +4,8 @@
 
 - 最終更新日：2026-06-14
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）を正式取り込み済み。残り2コミットの設計整合性調査を完了。
-- 次の主要目標：残り2コミットの取り込み判断と、改造版初期差分の設計。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）を正式取り込み済み。Admin build fingerprintコミットの検証を完了し、正式取り込み可能と判断。
+- 次の主要目標：Admin CORS運用改善コミットの検証と、改造版初期差分の設計。
 
 ## 現在のゴール
 
@@ -40,17 +40,18 @@
 - [x] LIFFセキュリティ修正 `e2689ba3228cf3a8074b1edf6cf4f260502a70b3` を検証用ブランチへcherry-pickし、検証を完了
 - [x] 検証済み優先2コミットと検証記録を `custom/main` へ正式取り込みし、`origin/custom/main` へpush
 - [x] 残り2コミット `a0a9c60849e5b25c030b6d40e514f5242721dac1` と `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` の設計整合性を調査
+- [x] Admin build fingerprint `a0a9c60849e5b25c030b6d40e514f5242721dac1` を検証用ブランチで検証し、正式取り込み可能と判断
 
 ## 現在進行中の作業
 
-- [ ] 残り2コミットの取り込み判断
+- [ ] Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` の検証
 - [ ] 改造版初期差分の設計
 
 ## 次に行う作業
 
-1. Admin build fingerprint `a0a9c60849e5b25c030b6d40e514f5242721dac1` を取り込むか決定する
-2. Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を、`docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新と合わせて取り込むか決定する
-3. 取り込む場合は、個別検証用ブランチを作り、1件ずつcherry-pickしてAdmin/Worker関連のtest・typecheck・buildを実行する
+1. Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を、`docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新と合わせて検証する
+2. 検証用ブランチを作り、`1c4adff` をcherry-pickしてWorker deploy workflow、Admin CORS、関連資料の整合性を確認する
+3. 必要なtest・typecheck・buildを実行する
 4. `packages/create-line-harness` の変更対象を確定する
 
 ## 現在のローカル環境
@@ -136,7 +137,7 @@
 
 ## 次回Codexへ依頼する作業
 
-残り2コミットの取り込み可否を決定してください。設計整合性調査では、Admin build fingerprint `a0a9c60849e5b25c030b6d40e514f5242721dac1` は「そのまま取り込む」推奨、Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` は「修正して取り込む」推奨です。後者はコミット本体に加えて `docs/FORK_CLOUDFLARE_WORKFLOW.md` のrepo Variables一覧へ `ADMIN_ORIGIN` / `ADMIN_ALLOW_CROSS_SITE` / `WORKER_URL` を追記するのが望ましいです。
+Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を、`docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新とセットで検証してください。設計整合性調査では「修正して取り込む」推奨です。コミット本体に加えて、Fork運用資料のrepo Variables一覧へ `ADMIN_ORIGIN` / `ADMIN_ALLOW_CROSS_SITE` / `WORKER_URL` を追記するのが望ましいです。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 
@@ -179,3 +180,27 @@
 2. `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` + `docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新
 
 今回の調査では、cherry-pick、merge、ブランチ作成、ソースコード修正、workflow修正、Cloudflare操作、npm操作は行っていない。
+
+## Admin build fingerprint検証結果（2026-06-14）
+
+検証ブランチ：`validate/upstream-a0a9c60-build-fingerprint`
+
+| 項目 | 結果 |
+|---|---|
+| 対象コミット | `a0a9c60849e5b25c030b6d40e514f5242721dac1` |
+| 検証ブランチ上commit | `cf23efd5a00b...` |
+| cherry-pick | 競合なしで成功 |
+| Webテスト | `pnpm --filter web test` 成功。2 files / 8 tests passed |
+| 環境変数なしbuild | `NEXT_PUBLIC_API_URL=https://worker.example.test pnpm --filter web build` 成功。commit SHAはGit情報、build時刻はbuild時ISO時刻へfallback |
+| 環境変数ありbuild | `APP_COMMIT_SHA=1234567 APP_BUILD_TIME=2026-06-14T12:34:56Z NEXT_PUBLIC_API_URL=https://worker.example.test pnpm --filter web build` 成功 |
+| Cloudflare Pages向けbuild | `NEXT_PUBLIC_API_URL=https://worker.example.test pnpm deploy:web` 成功 |
+| 最初のbuild失敗 | `NEXT_PUBLIC_API_URL` 未設定による既存仕様の失敗。Build Fingerprint起因ではない |
+| 取り込み判断 | そのまま正式取り込み可能 |
+
+補足：
+
+- GitHub Actions workflowに不要な権限追加、secret追加、deploy先やbranch条件の意図しない変更は見つからなかった。
+- 表示情報はversion、commit SHA、build時刻であり、秘密情報漏えいの懸念は低い。
+- ローカル実画面プレビューは未実施。build成果物と差分で確認した。
+- `L Harness` 表示名は今回は維持し、将来の改造版ブランド確定時に再確認する。
+- Cloudflare deploy、本番環境変更、LINE設定変更、npm publishは実施していない。
