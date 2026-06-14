@@ -4,8 +4,8 @@
 
 - 最終更新日：2026-06-14
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）を正式取り込み済み。Admin build fingerprintコミットの検証を完了し、正式取り込み可能と判断。
-- 次の主要目標：Admin CORS運用改善コミットの検証と、改造版初期差分の設計。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）とAdmin build fingerprintを正式取り込み済み。Worker CORS Variables対応も検証を完了し、資料追記込みで正式取り込み可能と判断。これを `custom/main` へ取り込めば、上流調査対象4コミット対応は一段落する。
+- 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
 
@@ -41,18 +41,19 @@
 - [x] 検証済み優先2コミットと検証記録を `custom/main` へ正式取り込みし、`origin/custom/main` へpush
 - [x] 残り2コミット `a0a9c60849e5b25c030b6d40e514f5242721dac1` と `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` の設計整合性を調査
 - [x] Admin build fingerprint `a0a9c60849e5b25c030b6d40e514f5242721dac1` を検証用ブランチで検証し、正式取り込み可能と判断
+- [x] Worker CORS Variables `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を検証用ブランチで検証し、資料追記込みで正式取り込み可能と判断
+- [x] Fork運用資料 `docs/FORK_CLOUDFLARE_WORKFLOW.md` にWorker CORS Variablesのrepo Variables説明を追加
 
 ## 現在進行中の作業
 
-- [ ] Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` の検証
 - [ ] 改造版初期差分の設計
 
 ## 次に行う作業
 
-1. Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を、`docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新と合わせて検証する
-2. 検証用ブランチを作り、`1c4adff` をcherry-pickしてWorker deploy workflow、Admin CORS、関連資料の整合性を確認する
-3. 必要なtest・typecheck・buildを実行する
-4. `packages/create-line-harness` の変更対象を確定する
+1. Worker CORS Variables対応を `custom/main` へfast-forwardで取り込み、`origin/custom/main` へpushする
+2. 上流の調査対象4コミット対応が一段落したことを確認する
+3. `packages/create-line-harness` の変更対象を確定する
+4. 改造版初期差分の設計を進める
 
 ## 現在のローカル環境
 
@@ -87,8 +88,8 @@
 - 作成済みローカルブランチ：`custom/main`
 - `custom/main` の起点：`1515a74cbe2f7154fdb09ad2f370e743ed8421a6`
 - 作成済み検証ブランチ：`integrate/upstream-v0.15.0-fixes`
-- `custom/main` の現在コミット：`273caf2233f64653eac4be15ab68869d39c8189f`
-- `integrate/upstream-v0.15.0-fixes` の現在コミット：`273caf2233f64653eac4be15ab68869d39c8189f`
+- `custom/main` の現在コミット：作業ごとの最終確認で `git rev-parse HEAD` と `git rev-parse origin/custom/main` を照合する
+- `integrate/upstream-v0.15.0-fixes`：優先未リリース2コミット検証用のローカルブランチ
 - 評価済み未リリースコミット：
   - `a0a9c60849e5b25c030b6d40e514f5242721dac1`
   - `43cbee6f1c3b6f3f74f0b9f85853c39b1c2c6d01`
@@ -116,7 +117,7 @@
 - 既存本番カスタマイズを引き継ぐか
 - 開発用Cloudflareリソース名
 - テスト用LINE公式アカウントの準備状況
-- `main`の未リリース4コミットの実際の取り込み有無
+- 実Cloudflare環境で、Worker secretsとplain varsが同名で存在する場合の最終的な優先順位
 - 公式CLI `0.1.25`とnpm公開済み`0.1.24`のどちらをインストーラー調査基準にするか
 - MIT License表示の具体的な整備方法
 
@@ -137,7 +138,7 @@
 
 ## 次回Codexへ依頼する作業
 
-Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を、`docs/FORK_CLOUDFLARE_WORKFLOW.md` 更新とセットで検証してください。設計整合性調査では「修正して取り込む」推奨です。コミット本体に加えて、Fork運用資料のrepo Variables一覧へ `ADMIN_ORIGIN` / `ADMIN_ALLOW_CROSS_SITE` / `WORKER_URL` を追記するのが望ましいです。
+上流の調査対象4コミット対応は、Worker CORS Variables対応を `custom/main` へfast-forwardしてpushできれば一段落です。次は、改造版初期リリースに向けて `packages/create-line-harness` の固定参照、ローカル設定名、update無効化、Cloudflareリソース安全確認の設計を固めてください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 
@@ -204,3 +205,47 @@ Admin CORS運用改善 `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を、`docs/FO
 - ローカル実画面プレビューは未実施。build成果物と差分で確認した。
 - `L Harness` 表示名は今回は維持し、将来の改造版ブランド確定時に再確認する。
 - Cloudflare deploy、本番環境変更、LINE設定変更、npm publishは実施していない。
+
+## Worker CORS Variables検証結果（2026-06-14）
+
+検証ブランチ：`validate/upstream-1c4adff-worker-cors-vars`
+
+| 項目 | 結果 |
+|---|---|
+| 対象コミット | `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` |
+| 検証ブランチ上commit | `416ed3d054b6bcb2f9ac1fda5d6a7cbac3b5eeac` |
+| cherry-pick | 競合なしで成功 |
+| 上流変更ファイル | `.github/workflows/deploy-cloudflare-worker.yml`, `docs/ADMIN-AUTH.md` |
+| 追加した運用資料 | `docs/FORK_CLOUDFLARE_WORKFLOW.md` |
+| 運用資料commit | `bf3c9e3e0a1f217a2353cc5c6533466ae68c0f8f` |
+| Workflow構文確認 | 成功 |
+| Worker typecheck | 成功 |
+| Admin auth config test | 成功。1 file / 20 tests passed |
+| repo Variables注入テスト | 5パターン成功 |
+| 取り込み判断 | 資料追記込みで正式取り込み可能 |
+
+確認した内容：
+
+- GitHub ActionsのWorker deployで、repo Variables `ADMIN_ORIGIN` / `ADMIN_ALLOW_CROSS_SITE` / `WORKER_URL` をdeploy前の `apps/worker/dist/line_harness/wrangler.json` へ注入する。
+- `ADMIN_ORIGIN` が未設定の場合はno-opで、既存のsame-site構成には影響しない。
+- `ADMIN_ALLOW_CROSS_SITE` 未設定時は文字列 `"true"` になり、`false` 指定時は文字列 `"false"` として保持される。
+- Worker側は `env.ADMIN_ALLOW_CROSS_SITE === 'true'` で判定するため、`"false"` はfalseとして扱われる。
+- `WORKER_URL` 未設定時はvarsへ追加されない。
+- `jq` により既存varsやD1設定を保持できる。
+- 特殊文字を含むURLでもJSONは壊れない。
+- `docs/FORK_CLOUDFLARE_WORKFLOW.md` にFork運用時のrepo Variables説明を追加済み。
+
+責務分離：
+
+- npxインストーラーは、第三者が新規環境を構築する際にWorkerへ初期設定する。
+- GitHub Actionsは、Fork運用中の再deployで必要な設定を再現する。
+
+未実施・未確認：
+
+- Cloudflare deploy、GitHub Actions手動実行、本番環境変更、LINE設定変更、npm publishは実施していない。
+- 実Cloudflare環境で、同名のsecretとplain varが存在する場合の最終的な優先順位は未検証。
+- 同じ運用値を設定する前提では衝突リスクは低いが、今後の検証環境または本番環境での再deploy時に確認する。
+
+補足：
+
+- この対応を `custom/main` へfast-forwardで取り込めば、`v0.15.0` 後の上流調査対象4コミットの検証・取り込み作業は一段落する。

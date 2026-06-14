@@ -704,3 +704,95 @@ build時刻の取得方法：
 最終評価：
 
 - そのまま正式取り込み可能。
+
+---
+
+## Worker CORS Variables検証結果
+
+検証日：2026-06-14
+
+対象コミット：
+
+| コミット | 件名 | 検証ブランチ上のcommit |
+|---|---|---|
+| `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` | `feat(ci): bake admin CORS vars into deploy config so they survive redeploys (#165)` | `416ed3d054b6bcb2f9ac1fda5d6a7cbac3b5eeac` |
+
+検証ブランチ：
+
+- `validate/upstream-1c4adff-worker-cors-vars`
+
+cherry-pick結果：
+
+- 専用検証ブランチで対象コミットをcherry-pickした。
+- 競合なしで成功した。
+- ローカルcommitは `416ed3d054b6bcb2f9ac1fda5d6a7cbac3b5eeac` になった。
+
+上流コミットで変更されたファイル：
+
+- `.github/workflows/deploy-cloudflare-worker.yml`
+- `docs/ADMIN-AUTH.md`
+
+カスタマイズ版で追加した運用資料：
+
+- `docs/FORK_CLOUDFLARE_WORKFLOW.md`
+
+運用資料commit：
+
+- `bf3c9e3e0a1f217a2353cc5c6533466ae68c0f8f`
+
+### GitHub Actionsでの設定注入
+
+Worker deploy workflowは、GitHub Actions repo Variablesから以下を読み込む。
+
+- `ADMIN_ORIGIN`
+- `ADMIN_ALLOW_CROSS_SITE`
+- `WORKER_URL`
+
+確認した挙動：
+
+- `ADMIN_ORIGIN` が設定されている場合だけ、deploy前の一時生成物 `apps/worker/dist/line_harness/wrangler.json` へvarsを注入する。
+- `jq` を使ってJSONを更新し、既存varsやD1設定を保持する。
+- `ADMIN_ALLOW_CROSS_SITE` 未設定時は文字列 `"true"` になる。
+- `ADMIN_ALLOW_CROSS_SITE=false` 指定時は文字列 `"false"` が保持される。
+- Worker側は `env.ADMIN_ALLOW_CROSS_SITE === 'true'` で判定するため、`"false"` はfalseとして正常に扱われる。
+- `WORKER_URL` 未設定時はvarsへ追加されない。
+- `ADMIN_ORIGIN` 未設定時はno-opになる。
+- 特殊文字を含むURLでもJSONは壊れない。
+
+ローカル再現テスト結果：
+
+```text
+pattern A ok
+pattern B ok
+pattern C ok
+pattern D ok
+pattern E ok
+```
+
+実行した検証：
+
+| 検証 | 結果 |
+|---|---|
+| YAML構文確認 | 成功 |
+| `pnpm --filter worker typecheck` | 成功 |
+| `pnpm --filter worker test -- src/middleware/admin-auth-config.test.ts` | 成功。1 file / 20 tests passed |
+
+### npxインストーラーとGitHub Actionsの責務分離
+
+| 項目 | 責務 |
+|---|---|
+| npxインストーラー | 第三者が新規環境を構築する際に、Workerへ初期設定する。`packages/create-line-harness/src/steps/admin-auth.ts` が `ADMIN_ORIGIN`、`ADMIN_ALLOW_CROSS_SITE`、必要に応じて `WORKER_URL` をWorker secretsとして登録する。 |
+| GitHub Actions | Fork運用中の再deployで、必要な設定を再現する。repo Variablesをdeploy前のwrangler configへ注入し、Dashboard手動設定がredeployで落ちる事故を防ぐ。 |
+
+このため、npxインストーラーの初期構築処理と、GitHub Actionsの再deploy補強は責務が別で両立可能と判断した。
+
+### 未確認事項
+
+- 実Cloudflare環境で、同名のsecretとplain varが存在する場合の最終的な優先順位は未検証。
+- 今回はdeploy禁止のため、実環境確認は行っていない。
+- 同じ運用値を設定する前提では衝突リスクは低い。
+- 今後、本番または検証環境で再deployする際の確認対象とする。
+
+最終評価：
+
+- 資料追記込みで正式取り込み可能。
