@@ -11,6 +11,13 @@
 
 今後のCodex作業で、進捗、決定事項、未決定事項、インストーラー設計方針、リリース前確認項目を継続的に確認・更新できる状態を作る。
 
+## Codex作業時の参照資料
+
+- `AGENTS.md`：共通作業ルール
+- `docs/CUSTOM_RELEASE_POLICY.md`：初期リリース設計方針
+- `docs/PROJECT_STATUS.md`：現在の進捗
+- `docs/UPSTREAM_ANALYSIS.md`：上流との差分と検証履歴
+
 ## 完了した作業
 
 - [x] プロジェクト計画書の作成を確認
@@ -68,10 +75,10 @@
 
 ## 次に行う作業
 
-1. 自動update無効化対応を `custom/main` へfast-forwardで取り込み、`origin/custom/main` へpushする
-2. 次のP0作業として、setup用clone元を改造版の固定tagまたはcommit SHAへ変更する
-3. Cloudflare同名リソース時の停止処理を設計・実装する
-4. 改造版専用ローカル設定名、package/MCP名の設計を進める
+1. 次のP0作業として、setup用clone元を改造版の固定tagまたはcommit SHAへ変更する
+2. Cloudflare同名リソース時の停止処理を設計・実装する
+3. 改造版専用ローカル設定名、package/MCP名の設計を進める
+4. 新規環境でのインストール試験計画を具体化する
 
 ## 現在のローカル環境
 
@@ -120,6 +127,7 @@
 - `docs/プロジェクト計画書.md`
 - `docs/README.md`
 - `docs/PROJECT_STATUS.md`
+- `docs/CUSTOM_RELEASE_POLICY.md`
 - `docs/DECISIONS.md`
 - `docs/INSTALLER_ARCHITECTURE.md`
 - `docs/RELEASE_CHECKLIST.md`
@@ -156,7 +164,7 @@
 
 ## 次回Codexへ依頼する作業
 
-自動update無効化対応を `custom/main` へfast-forwardしてpushしてください。次は、改造版初期リリースに向けて `packages/create-line-harness` のsetup用clone元を改造版の固定tagまたはcommit SHAへ変更し、公式ソースへ戻る経路を閉じてください。
+次は、改造版初期リリースに向けて `packages/create-line-harness` のsetup用clone元を改造版の固定tagまたはcommit SHAへ変更し、公式ソースへ戻る経路を閉じてください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 
