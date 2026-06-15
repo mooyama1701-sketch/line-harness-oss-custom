@@ -4,7 +4,7 @@
 
 - 最終更新日：2026-06-15
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、CLI・Worker API・Web管理画面の自動update入口を停止する検証も完了し、正式取り込み可能と判断済み。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -61,10 +61,10 @@
 - Worker再deploy時のCORS Variables保護
 - 初期リリースでの自動update無効化
 - 改造版ソースの固定参照（暫定commit）
+- Cloudflare同名リソース時の停止処理（実Cloudflare環境ではなくmockで検証）
 
 未完了：
 
-- Cloudflare同名リソース時の停止処理
 - 改造版専用ローカル設定名
 - 改造版専用package/MCP名
 - 新規環境でのインストール試験
@@ -75,10 +75,9 @@
 
 ## 次に行う作業
 
-1. 次のP0作業として、Cloudflare同名リソース時の停止処理を設計・実装する
-2. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
-3. 改造版専用ローカル設定名、package/MCP名の設計を進める
-4. 新規環境でのインストール試験計画を具体化する
+1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
+2. 改造版専用ローカル設定名、package/MCP名の設計を進める
+3. 新規環境でのインストール試験計画を具体化する
 
 ## 現在のローカル環境
 
@@ -156,15 +155,15 @@
 
 - `upstream` は公式リポジトリを向いているため、誤って公式へpushしないよう運用上の注意が必要
 - 仮名称が多く、公開前に正式名称を決める必要がある
-- 公式インストーラー内部の処理が未調査のため、変更対象ファイルと安全上のリスクが未確定
+- setup処理でCloudflare同名リソース時の停止処理はmock検証済みだが、実Cloudflare環境でのread-only確認は未実施
 - 本番環境と検証環境の分離を徹底しないと、CloudflareやLINE設定へ影響する可能性がある
 - 公式リポジトリにはroot `LICENSE` が存在しないため、正式なLICENSE本文または元開発者の許諾を確認するまでnpmでの正式公開は行わない
-- 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があり、新規構築限定の安全原則に合わせて停止または明示確認へ変更する必要がある
+- 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があったが、改造版setupでは同名Worker、Pages project、D1 database、R2 bucketを検出した場合に作成・更新・deploy・migration前に停止するよう変更済み
 - 公式update機能は公式release-manifestを参照するため、改造版初期版では自動更新を実行させず、未対応案内を表示して終了させる対応を検証済み。正式取り込み後も、将来updateを復活させる場合は改造版manifest設計が必要。
 
 ## 次回Codexへ依頼する作業
 
-次は、改造版初期リリースに向けてCloudflare同名リソース時の停止処理を設計・実装してください。setup用clone元の固定commitは暫定値のため、初期リリース直前に最終commitへ更新してください。
+次は、初期リリース直前にsetup用clone元の固定commitを最終commitへ更新してください。あわせて、改造版専用ローカル設定名、package/MCP名、新規環境でのインストール試験計画を具体化してください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 

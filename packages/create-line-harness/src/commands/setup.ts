@@ -13,6 +13,10 @@ import { deployAdmin } from "../steps/deploy-admin.js";
 import { setSecrets } from "../steps/secrets.js";
 import { configureAdminAuth } from "../steps/admin-auth.js";
 import { generateMcpConfig } from "../steps/mcp-config.js";
+import {
+  assertNoCloudflareResourceCollisions,
+  CloudflareResourceCollisionError,
+} from "../steps/resource-collision.js";
 import { generateApiKey } from "../lib/crypto.js";
 import {
   getAccountIds,
@@ -340,6 +344,11 @@ export async function runSetup(repoDir: string): Promise<void> {
     cleanupSuccess();
   } catch (error) {
     cleanupFailure();
+    if (error instanceof CloudflareResourceCollisionError) {
+      p.log.error(error.message);
+      p.cancel("セットアップを停止しました。");
+      process.exit(1);
+    }
     if (error instanceof WranglerError) {
       const help = error.getHelp();
       if (help) {
@@ -387,6 +396,45 @@ async function runSetupInner(
   applyPatchedConfig(state, repoDir, state.accountId);
   saveState(repoDir, state);
 
+  // Get project name (used for Worker + D1 naming)
+  if (!state.projectName) {
+    const projectName = await p.text({
+      message: "プロジェクト名（Worker と D1 の名前に使われます）",
+      placeholder: "line-harness",
+      defaultValue: "line-harness",
+      validate(value) {
+        if (!value) return undefined; // use default
+        if (!/^[a-z0-9][a-z0-9-]*$/.test(value)) {
+          return "英小文字・数字・ハイフンのみ使用できます（例: my-line-bot）";
+        }
+      },
+    });
+    if (p.isCancel(projectName)) {
+      p.cancel("セットアップをキャンセルしました");
+      process.exit(0);
+    }
+    state.projectName = (projectName as string).trim() || "line-harness";
+    saveState(repoDir, state);
+  } else {
+    p.log.success(`プロジェクト名: ${state.projectName}`);
+  }
+
+  if (!state.apiKey) {
+    state.apiKey = generateApiKey();
+    saveState(repoDir, state);
+  }
+
+  state.workerName = state.projectName!;
+  const r2BucketName = `${state.projectName}-images`;
+  const adminProjectName = `${state.projectName}-admin-${state.apiKey!.slice(0, 8)}`;
+
+  await assertNoCloudflareResourceCollisions({
+    workerName: state.workerName,
+    pagesProjectName: adminProjectName,
+    d1DatabaseName: state.projectName!,
+    r2BucketName,
+  });
+
   // Step 1: Cloudflare R2 billing setup
   if (!isDone(state, "r2billing")) {
     p.log.step("═══ Step 1. Cloudflare 設定 ═══");
@@ -410,29 +458,6 @@ async function runSetupInner(
     });
     markDone(state, "r2billing");
     saveState(repoDir, state);
-  }
-
-  // Get project name (used for Worker + D1 naming)
-  if (!state.projectName) {
-    const projectName = await p.text({
-      message: "プロジェクト名（Worker と D1 の名前に使われます）",
-      placeholder: "line-harness",
-      defaultValue: "line-harness",
-      validate(value) {
-        if (!value) return undefined; // use default
-        if (!/^[a-z0-9][a-z0-9-]*$/.test(value)) {
-          return "英小文字・数字・ハイフンのみ使用できます（例: my-line-bot）";
-        }
-      },
-    });
-    if (p.isCancel(projectName)) {
-      p.cancel("セットアップをキャンセルしました");
-      process.exit(0);
-    }
-    state.projectName = (projectName as string).trim() || "line-harness";
-    saveState(repoDir, state);
-  } else {
-    p.log.success(`プロジェクト名: ${state.projectName}`);
   }
 
   // Step 4: Get LINE credentials (skip if already saved)
@@ -490,12 +515,6 @@ async function runSetupInner(
     p.log.success(`LIFF ID: 入力済み（${state.liffId}）`);
   }
 
-  // Step 6: Generate API key (skip if already generated)
-  if (!state.apiKey) {
-    state.apiKey = generateApiKey();
-    saveState(repoDir, state);
-  }
-
   // Step 7: Create D1 database + run migrations
   if (!isDone(state, "database")) {
     const { databaseId, databaseName } = await createDatabase(repoDir, state.projectName!);
@@ -517,7 +536,6 @@ async function runSetupInner(
   }
 
   // Step 8: Create R2 bucket for image uploads
-  const r2BucketName = `${state.projectName}-images`;
   if (!isDone(state, "r2")) {
     const s = p.spinner();
     s.start("R2 バケット作成中...");
@@ -558,7 +576,6 @@ async function runSetupInner(
   }
 
   // Step 10: Deploy Worker (includes LIFF build via @cloudflare/vite-plugin)
-  state.workerName = state.projectName!;
   if (!isDone(state, "worker")) {
     const { workerUrl } = await deployWorker({
       repoDir,
@@ -692,8 +709,6 @@ ON CONFLICT(channel_id) DO UPDATE SET
 
   // Step 13: Deploy Admin UI
   // Use unique project names to avoid subdomain collision
-  const suffix = state.apiKey!.slice(0, 8);
-  const adminProjectName = `${state.projectName}-admin-${suffix}`;
   if (!isDone(state, "admin")) {
     const { adminUrl } = await deployAdmin({
       repoDir,

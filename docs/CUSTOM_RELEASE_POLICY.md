@@ -40,5 +40,6 @@
 - update無効化は完了。
 - 改造版ソースの固定参照は暫定commitで実装済み。
 - 固定commitは初期リリース直前に最終更新が必要。
-- Cloudflare同名リソース停止は未対応。
+- Cloudflare同名リソース停止は実装済み。Worker、Pages project、D1 database、R2 bucketの同名検出時は、作成・更新・deploy・migration前にsetupを停止する。
+- Cloudflare同名リソース停止は実Cloudflare環境ではなくmockで検証済み。
 - package名、設定名、MCP名は未確定。
