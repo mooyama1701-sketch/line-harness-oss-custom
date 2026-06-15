@@ -66,12 +66,14 @@ type UpdateEnv = {
     ADMIN_PAGES_PROJECT: string;
     LIFF_PAGES_PROJECT: string;
     D1_DATABASE_ID: string;
-    MANIFEST_URL: string;
+    MANIFEST_URL?: string;
     WORKER_PUBLIC_URL: string;
     ADMIN_PUBLIC_URL: string;
     LIFF_PUBLIC_URL: string;
   };
 };
+
+const UPDATE_ENABLED = false;
 
 const app = new Hono<UpdateEnv>();
 
@@ -128,7 +130,23 @@ app.use('/*', async (c, next) => {
  *     snapshot row and are visible via `/status/:id`.
  */
 app.post('/start', async (c) => {
-  const manifest = await fetchManifest(c.env.MANIFEST_URL);
+  if (!UPDATE_ENABLED) {
+    return c.json(
+      {
+        code: 'UPDATE_DISABLED',
+        error: 'UPDATE_DISABLED',
+        message: '初期リリースでは自動更新機能を利用できません',
+      },
+      501,
+    );
+  }
+
+  const manifestUrl = c.env.MANIFEST_URL;
+  if (!manifestUrl) {
+    return c.json({ error: 'manifest_not_configured' }, 500);
+  }
+
+  const manifest = await fetchManifest(manifestUrl);
   // The manifest always pins one "latest" version; locate that entry. If the
   // manifest is malformed (latest doesn't appear in releases[]) we fail
   // closed rather than guess.
@@ -195,7 +213,7 @@ app.post('/start', async (c) => {
         d1DatabaseId: c.env.D1_DATABASE_ID,
         current,
         target,
-        manifestUrl: c.env.MANIFEST_URL,
+        manifestUrl,
       },
       d1,
       workerHealthUrl: `${c.env.WORKER_PUBLIC_URL}/api/health`,

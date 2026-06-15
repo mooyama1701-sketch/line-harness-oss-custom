@@ -24,6 +24,8 @@ export interface CurrentVersion {
   worker_hash: string;
   admin_hash: string;
   liff_hash: string;
+  updateEnabled?: boolean;
+  updateAvailable?: boolean;
 }
 
 export type ForkStatus =

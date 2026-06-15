@@ -15,6 +15,7 @@ type Status =
   | { kind: 'latest'; version: string }
   | { kind: 'fork'; reason: string; version: string }
   | { kind: 'upgrade'; current: string; target: ReleaseEntry }
+  | { kind: 'disabled'; version: string }
 
 const updateBannerEnabled = process.env.NEXT_PUBLIC_UPDATE_BANNER_ENABLED !== 'false'
 
@@ -27,10 +28,13 @@ export function UpdateBanner() {
     let cancelled = false
     ;(async () => {
       try {
-        const [current, manifest] = await Promise.all([
-          getCurrentVersion(),
-          getManifest(),
-        ])
+        const current = await getCurrentVersion()
+        if (cancelled) return
+        if (current.updateEnabled === false) {
+          setStatus({ kind: 'disabled', version: current.version })
+          return
+        }
+        const manifest = await getManifest()
         if (cancelled) return
         const fork = detectFork(current, manifest)
         if (fork.kind === 'fork') {
@@ -69,6 +73,14 @@ export function UpdateBanner() {
     return (
       <div className="text-xs text-gray-500 px-4 py-2 border-b bg-gray-50">
         v{status.version} (最新)
+      </div>
+    )
+  }
+
+  if (status.kind === 'disabled') {
+    return (
+      <div className="text-xs text-gray-500 px-4 py-2 border-b bg-gray-50">
+        v{status.version} (初期リリースでは自動更新に対応していません)
       </div>
     )
   }

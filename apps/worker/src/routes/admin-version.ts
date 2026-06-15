@@ -7,21 +7,12 @@ import {
   RELEASED_AT,
 } from '../_version.js';
 
-const DEFAULT_MANIFEST_URL =
-  'https://github.com/Shudesu/line-harness-oss/releases/latest/download/release-manifest.json';
-
-type Env = {
-  Bindings: {
-    MANIFEST_URL?: string;
-  };
-};
-
 // Unauthenticated by design — returns build-time public metadata used by the
 // dashboard's upgrade banner before the user logs in. The manifest proxy exists
 // because GitHub release assets do not reliably send browser CORS headers.
 // Task 18's /admin/update/* mounts under the same /admin prefix but layers
 // ADMIN_API_KEY middleware on those subpaths.
-const app = new Hono<Env>();
+const app = new Hono();
 
 app.get('/version', (c) =>
   c.json({
@@ -30,26 +21,21 @@ app.get('/version', (c) =>
     admin_hash: ADMIN_HASH,
     liff_hash: LIFF_HASH,
     released_at: RELEASED_AT,
+    updateEnabled: false,
+    updateAvailable: false,
   }),
 );
 
-app.get('/manifest', async (c) => {
-  const manifestUrl = c.env?.MANIFEST_URL ?? DEFAULT_MANIFEST_URL;
-  const upstream = await fetch(manifestUrl, {
-    cf: { cacheTtl: 60, cacheEverything: true },
-  });
-
-  if (!upstream.ok) {
-    return c.json({ error: 'manifest_fetch_failed' }, 502);
-  }
-
-  return new Response(upstream.body, {
-    headers: {
-      'Content-Type':
-        upstream.headers.get('Content-Type') ?? 'application/json; charset=utf-8',
-      'Cache-Control': 'public, max-age=60',
+app.get('/manifest', (c) => {
+  return c.json(
+    {
+      code: 'UPDATE_DISABLED',
+      message: '初期リリースでは自動更新機能を利用できません',
+      updateEnabled: false,
+      updateAvailable: false,
     },
-  });
+    501,
+  );
 });
 
 export default app;

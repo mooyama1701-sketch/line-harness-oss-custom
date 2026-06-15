@@ -53,12 +53,16 @@ export async function getCurrentVersion(): Promise<CurrentVersion> {
     worker_hash: string
     admin_hash: string
     liff_hash: string
+    updateEnabled?: boolean
+    updateAvailable?: boolean
   }
   return {
     version: j.version,
     worker_hash: j.worker_hash,
     admin_hash: j.admin_hash,
     liff_hash: j.liff_hash,
+    updateEnabled: j.updateEnabled,
+    updateAvailable: j.updateAvailable,
   }
 }
 

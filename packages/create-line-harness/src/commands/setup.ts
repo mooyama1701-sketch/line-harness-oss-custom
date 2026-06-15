@@ -735,8 +735,6 @@ ON CONFLICT(channel_id) DO UPDATE SET
       adminPublicUrl: state.adminUrl!,
       liffPagesProject: `${state.workerName}-liff`,
       liffPublicUrl: state.workerUrl!,
-      manifestUrl:
-        "https://github.com/Shudesu/line-harness-oss/releases/latest/download/release-manifest.json",
     });
     markDone(state, "workerConfig");
     saveState(repoDir, state);
@@ -798,12 +796,10 @@ ON CONFLICT(channel_id) DO UPDATE SET
     "セットアップ完了！",
   );
 
-  // Save config for future updates (separate from setup state).
+  // Save install metadata (separate from setup state).
   // Writes BOTH legacy field names (for older update.ts versions) and the
-  // new Task 22 names (so future `npx create-line-harness update` runs
-  // don't have to prompt for missing fields). We intentionally omit
-  // liffProject because current setup serves LIFF from the Worker via
-  // [assets], not a separate Pages project.
+  // new Task 22 names for compatibility. Automatic updates are disabled in
+  // the initial custom release, so no manifest URL is written here.
   const configPath = join(repoDir, ".line-harness-config.json");
   const adminPublicUrl = state.adminUrl;
   const workerPublicUrl = state.workerUrl;
@@ -825,8 +821,6 @@ ON CONFLICT(channel_id) DO UPDATE SET
     liffPublicUrl: state.workerUrl,
     // liffProject is intentionally omitted — current setup serves LIFF
     // from the Worker via [assets], not a separate Pages project.
-    manifestUrl:
-      "https://github.com/Shudesu/line-harness-oss/releases/latest/download/release-manifest.json",
   };
   writeFileSync(configPath, JSON.stringify(fullConfig, null, 2) + "\n");
 

@@ -16,7 +16,7 @@ describe('update-client manifest URL', () => {
     vi.stubEnv('NEXT_PUBLIC_API_URL', 'https://example-worker.workers.dev')
     vi.stubEnv(
       'NEXT_PUBLIC_MANIFEST_URL',
-      'https://github.com/Shudesu/line-harness-oss/releases/latest/download/release-manifest.json',
+      'https://example.com/release-manifest.json',
     )
 
     const { getManifestUrl } = await loadUpdateClient()
@@ -38,5 +38,29 @@ describe('update-client manifest URL', () => {
       'https://example-worker.workers.dev/admin/manifest',
       { cache: 'no-store' },
     )
+  })
+
+  it('preserves update disabled flags from current version response', async () => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'https://example-worker.workers.dev')
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          version: '0.15.0',
+          worker_hash: 'sha256:worker',
+          admin_hash: 'sha256:admin',
+          liff_hash: 'sha256:liff',
+          updateEnabled: false,
+          updateAvailable: false,
+        }),
+      ),
+    )
+
+    const { getCurrentVersion } = await loadUpdateClient()
+
+    await expect(getCurrentVersion()).resolves.toMatchObject({
+      version: '0.15.0',
+      updateEnabled: false,
+      updateAvailable: false,
+    })
   })
 })

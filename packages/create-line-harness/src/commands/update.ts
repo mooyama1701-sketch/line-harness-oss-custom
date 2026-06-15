@@ -46,8 +46,13 @@ interface SetupState {
   [key: string]: unknown;
 }
 
-const DEFAULT_MANIFEST_URL =
-  "https://github.com/Shudesu/line-harness-oss/releases/latest/download/release-manifest.json";
+export const UPDATE_ENABLED = false;
+export const UPDATE_DISABLED_MESSAGE =
+  "このカスタマイズ版の初期リリースでは、自動更新機能は利用できません。更新方法が提供されるまでは、updateコマンドを実行しないでください。";
+
+export function isUpdateEnabled(): boolean {
+  return UPDATE_ENABLED;
+}
 
 export function loadState(repoDir: string): SetupState | null {
   const configPath = join(repoDir, ".line-harness-config.json");
@@ -131,6 +136,7 @@ function resolveState(
 
   // No legacy field for liffPublicUrl; require explicit value.
   if (!state.liffPublicUrl) missing.push("liffPublicUrl");
+  if (!state.manifestUrl) missing.push("manifestUrl");
 
   if (missing.length > 0) {
     return { ok: false, missing };
@@ -145,7 +151,7 @@ function resolveState(
       d1DatabaseId: state.d1DatabaseId!,
       cfAccountId: cfAccountId!,
       cfApiToken: cfApiToken!,
-      manifestUrl: state.manifestUrl ?? DEFAULT_MANIFEST_URL,
+      manifestUrl: state.manifestUrl!,
       workerPublicUrl: workerPublicUrl!,
       adminPublicUrl: adminPublicUrl!,
       liffPublicUrl: state.liffPublicUrl!,
@@ -386,6 +392,11 @@ async function promptForMissingFields(
 
 export async function runUpdate(repoDir: string): Promise<void> {
   p.intro(pc.bgCyan(pc.black(" LINE Harness アップデート ")));
+
+  if (!isUpdateEnabled()) {
+    p.cancel(UPDATE_DISABLED_MESSAGE);
+    process.exit(1);
+  }
 
   const configPath = join(repoDir, ".line-harness-config.json");
   let state = loadState(repoDir);

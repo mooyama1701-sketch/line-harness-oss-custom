@@ -122,70 +122,20 @@ describe('POST /admin/update/start', () => {
     expect(res.status).toBe(401);
   });
 
-  it('starts an update and returns 202 with updateId', async () => {
+  it('returns 501 UPDATE_DISABLED without reading manifest or running updates', async () => {
     const res = await request('/admin/update/start', {
       method: 'POST',
       headers: { 'x-admin-api-key': 'test-admin-key' },
     });
-    expect(res.status).toBe(202);
-    const body = (await res.json()) as { updateId: string };
-    expect(body.updateId).toBe('UPDATE_ID_123');
-    expect(runUpdate).toHaveBeenCalledTimes(1);
-  });
-
-  it('returns 200 with already_latest when target.version === current.version', async () => {
-    // Force the target to match the build-time current version (0.0.0-dev).
-    fetchManifest.mockResolvedValue({
-      ...baseManifest,
-      latest: '0.0.0-dev',
-      releases: [{ ...baseRelease, version: '0.0.0-dev' }],
-    });
-    // detectFork returns vanilla because hashes happen to match (the engine
-    // would actually compare them; we shortcut by returning vanilla here).
-    detectFork.mockReturnValue({
-      kind: 'vanilla',
-      matchedRelease: { ...baseRelease, version: '0.0.0-dev' },
-    });
-    const res = await request('/admin/update/start', {
-      method: 'POST',
-      headers: { 'x-admin-api-key': 'test-admin-key' },
-    });
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { error: string };
-    expect(body.error).toBe('already_latest');
+    expect(res.status).toBe(501);
+    const body = (await res.json()) as { code: string; error: string; message: string };
+    expect(body.code).toBe('UPDATE_DISABLED');
+    expect(body.error).toBe('UPDATE_DISABLED');
+    expect(body.message).toContain('初期リリース');
+    expect(fetchManifest).not.toHaveBeenCalled();
+    expect(detectFork).not.toHaveBeenCalled();
+    expect(findRelease).not.toHaveBeenCalled();
     expect(runUpdate).not.toHaveBeenCalled();
-  });
-
-  it('returns 409 fork_detected when detectFork reports a fork', async () => {
-    detectFork.mockReturnValue({
-      kind: 'fork',
-      reason: 'worker hash mismatch (custom build)',
-    });
-    const res = await request('/admin/update/start', {
-      method: 'POST',
-      headers: { 'x-admin-api-key': 'test-admin-key' },
-    });
-    expect(res.status).toBe(409);
-    const body = (await res.json()) as { error: string; reason: string };
-    expect(body.error).toBe('fork_detected');
-    expect(body.reason).toContain('worker hash mismatch');
-    expect(runUpdate).not.toHaveBeenCalled();
-  });
-
-  it('returns 500 update_failed when runUpdate rejects before snapshot creation', async () => {
-    // Simulate getLatestDeployment failing inside the engine — runUpdate
-    // rejects synchronously before producing a handle, so there's no
-    // updateId to return. The route should surface 500 update_failed so
-    // the dashboard can tell the operator the run never started.
-    runUpdate.mockRejectedValueOnce(new Error('cf pages api down'));
-    const res = await request('/admin/update/start', {
-      method: 'POST',
-      headers: { 'x-admin-api-key': 'test-admin-key' },
-    });
-    expect(res.status).toBe(500);
-    const body = (await res.json()) as { error: string; message: string };
-    expect(body.error).toBe('update_failed');
-    expect(body.message).toContain('cf pages api down');
   });
 });
 
