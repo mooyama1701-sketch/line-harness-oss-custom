@@ -258,7 +258,104 @@
 | 無効化 | `update`を受け付けず終了する | 誤更新を止められる | ユーザーには「なぜあるのに動かないか」の説明が必要 |
 | コマンドは残して案内だけ表示 | `update`実行時に「初期版では対象外」と表示して終了 | 将来拡張の導線を残し、初期版対象外と一致 | 実装上、公式manifest参照へ到達しない保証が必要 |
 
-推奨案：初期版では「コマンドは残して案内だけ表示」。理由は、CLI利用者へ将来機能であることを説明でき、公式update誤実行を防ぎつつ、将来の第2段階で再利用しやすいためです。ただし、これは今回の調査上の推奨であり、決定事項ではありません。
+## カスタマイズ版独自P0対応：初期リリースでの自動update無効化（2026-06-15）
+
+この対応は上流コミットの取り込みではなく、カスタマイズ版初期リリース向けの独自安全対策として実施した。
+
+| 項目 | 内容 |
+|---|---|
+| 検証ブランチ | `feature/disable-updates-for-initial-custom-release` |
+| 実装commit | `694fe73 fix: disable update flows for custom initial release` |
+| 変更規模 | 17 files changed / 167 insertions / 298 deletions |
+| 最終評価 | そのまま正式取り込み可能 |
+
+変更ファイル：
+
+- `apps/web/src/components/update/update-banner.tsx`
+- `apps/web/src/components/update/update-button.tsx`
+- `apps/web/src/hooks/use-update-notification.ts`
+- `apps/web/src/lib/update-client.test.ts`
+- `apps/web/src/lib/update-client.ts`
+- `apps/worker/src/routes/admin-update.test.ts`
+- `apps/worker/src/routes/admin-update.ts`
+- `apps/worker/src/routes/admin-version.test.ts`
+- `apps/worker/src/routes/admin-version.ts`
+- `apps/worker/wrangler.toml`
+- `packages/create-line-harness/src/commands/setup.ts`
+- `packages/create-line-harness/src/commands/update.ts`
+- `packages/create-line-harness/src/index.ts`
+- `packages/create-line-harness/src/lib/installed-wrangler.ts`
+- `packages/create-line-harness/test/update-disabled.test.ts`
+- `packages/create-line-harness/vitest.config.ts`
+- `packages/update-engine/src/types.ts`
+
+対応内容：
+
+- 初期リリースでは自動更新機能を無効化した。
+- CLI、Worker API、Web管理画面の3経路で更新を停止した。
+- setup生成物から `MANIFEST_URL` の自動設定を外した。
+- 公式manifest URLへのruntime参照を削除、または `UPDATE_ENABLED = false` により到達不能にした。
+
+CLI：
+
+- `update`コマンドは処理の最初で停止する。
+- config読み込み、manifest取得、bundle取得、Cloudflare操作へ進まない。
+- 利用者へ更新機能が利用できないことを表示する。
+- 終了コードは `1`。
+
+Worker：
+
+- `/admin/version` は `updateEnabled: false` と `updateAvailable: false` を返す。
+- `/admin/manifest` は `501` と `UPDATE_DISABLED` を返す。
+- `/admin/update/start` は `501` と `UPDATE_DISABLED` を返す。
+- version APIは公式manifestへ通信しない。
+- update APIはmigration、Worker更新、Pages更新へ進まない。
+
+Web管理画面：
+
+- 更新通知や更新ボタンから自動更新を実行できない。
+- 現在バージョンの表示は維持する。
+- APIを直接呼び出されてもWorker側で拒否する。
+
+検証結果：
+
+| 対象 | 結果 |
+|---|---|
+| create-line-harness Vitest | 1 file / 2 tests passed |
+| create-line-harness TypeScript typecheck | passed |
+| create-line-harness build | passed |
+| CLI update | exit code 1で即時停止 |
+| Worker update/version routes | 2 files / 12 tests passed |
+| Worker typecheck | passed |
+| Worker build | passed |
+| Web update client | 1 file / 3 tests passed |
+| Web TypeScript typecheck | passed |
+| Web production build | passed。`NEXT_PUBLIC_API_URL=https://worker.example.test` を使用 |
+| update-engine typecheck | passed |
+| update-engine build | passed |
+| update-engine existing tests | 14 files / 117 tests passed |
+
+`better-sqlite3`のローカル依存環境問題：
+
+- 初回のupdate-engine testは `better-sqlite3` のNode ABI不一致で失敗した。
+- 既存バイナリのABIは `137`、現在のNode ABIは `115`。
+- Node.jsは `v20.20.2`、`better-sqlite3` は `12.9.0`。
+- package.json、lockfile、依存versionを変更せず、対象限定のrebuildで修復した。
+- 実行した修復は、既存node_modulesが参照していたローカルpnpm storeを明示した `pnpm rebuild better-sqlite3`。
+- この修復はローカルの `node_modules` 内だけであり、Git管理対象の変更ではない。
+- ABI修復後、update-engineの既存テストは 14 files / 117 tests passed。
+
+残存事項：
+
+- setup用clone元はまだ公式リポジトリを参照している。
+  - `packages/create-line-harness/src/steps/clone-repo.ts`
+  - `https://github.com/Shudesu/line-harness-oss.git`
+- package repository metadataにも公式参照が残っている。
+- これらは次の「改造版ソース固定参照」タスクで対応する。
+- package名、ローカル設定名、MCP名は今回変更していない。
+- Cloudflareリソース重複対策も今回の範囲外。
+
+調査時点の推奨案は、初期版では「コマンドは残して案内だけ表示」だった。理由は、CLI利用者へ将来機能であることを説明でき、公式update誤実行を防ぎつつ、将来の第2段階で再利用しやすいため。2026-06-15に、上記のカスタマイズ版独自P0対応として実装・検証済み。
 
 ## Fork関連資料
 

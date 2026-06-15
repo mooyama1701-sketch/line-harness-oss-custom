@@ -2,9 +2,9 @@
 
 ## 基本情報
 
-- 最終更新日：2026-06-14
+- 最終更新日：2026-06-15
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）とAdmin build fingerprintを正式取り込み済み。Worker CORS Variables対応も検証を完了し、資料追記込みで正式取り込み可能と判断。これを `custom/main` へ取り込めば、上流調査対象4コミット対応は一段落する。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、CLI・Worker API・Web管理画面の自動update入口を停止する検証も完了し、正式取り込み可能と判断済み。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -43,6 +43,24 @@
 - [x] Admin build fingerprint `a0a9c60849e5b25c030b6d40e514f5242721dac1` を検証用ブランチで検証し、正式取り込み可能と判断
 - [x] Worker CORS Variables `1c4adffc8390e6b68ea0bba7aed3b566498a4e8c` を検証用ブランチで検証し、資料追記込みで正式取り込み可能と判断
 - [x] Fork運用資料 `docs/FORK_CLOUDFLARE_WORKFLOW.md` にWorker CORS Variablesのrepo Variables説明を追加
+- [x] 改造版初期リリース向けP0対応として、自動update無効化を検証し、正式取り込み可能と判断
+
+初期リリース準備状況：
+
+完了：
+
+- 上流優先修正の検証・取り込み
+- Build Fingerprint
+- Worker再deploy時のCORS Variables保護
+- 初期リリースでの自動update無効化
+
+未完了：
+
+- 改造版ソースの固定参照
+- Cloudflare同名リソース時の停止処理
+- 改造版専用ローカル設定名
+- 改造版専用package/MCP名
+- 新規環境でのインストール試験
 
 ## 現在進行中の作業
 
@@ -50,10 +68,10 @@
 
 ## 次に行う作業
 
-1. Worker CORS Variables対応を `custom/main` へfast-forwardで取り込み、`origin/custom/main` へpushする
-2. 上流の調査対象4コミット対応が一段落したことを確認する
-3. `packages/create-line-harness` の変更対象を確定する
-4. 改造版初期差分の設計を進める
+1. 自動update無効化対応を `custom/main` へfast-forwardで取り込み、`origin/custom/main` へpushする
+2. 次のP0作業として、setup用clone元を改造版の固定tagまたはcommit SHAへ変更する
+3. Cloudflare同名リソース時の停止処理を設計・実装する
+4. 改造版専用ローカル設定名、package/MCP名の設計を進める
 
 ## 現在のローカル環境
 
@@ -134,11 +152,11 @@
 - 本番環境と検証環境の分離を徹底しないと、CloudflareやLINE設定へ影響する可能性がある
 - 公式リポジトリにはroot `LICENSE` が存在しないため、正式なLICENSE本文または元開発者の許諾を確認するまでnpmでの正式公開は行わない
 - 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があり、新規構築限定の安全原則に合わせて停止または明示確認へ変更する必要がある
-- 公式update機能は公式release-manifestを参照するため、改造版初期版では自動更新を実行させず、未対応案内を表示して終了させる必要がある
+- 公式update機能は公式release-manifestを参照するため、改造版初期版では自動更新を実行させず、未対応案内を表示して終了させる対応を検証済み。正式取り込み後も、将来updateを復活させる場合は改造版manifest設計が必要。
 
 ## 次回Codexへ依頼する作業
 
-上流の調査対象4コミット対応は、Worker CORS Variables対応を `custom/main` へfast-forwardしてpushできれば一段落です。次は、改造版初期リリースに向けて `packages/create-line-harness` の固定参照、ローカル設定名、update無効化、Cloudflareリソース安全確認の設計を固めてください。
+自動update無効化対応を `custom/main` へfast-forwardしてpushしてください。次は、改造版初期リリースに向けて `packages/create-line-harness` のsetup用clone元を改造版の固定tagまたはcommit SHAへ変更し、公式ソースへ戻る経路を閉じてください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 
