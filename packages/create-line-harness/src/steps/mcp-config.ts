@@ -1,6 +1,7 @@
 import * as p from "@clack/prompts";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { CUSTOM_MCP_SERVER_NAME } from "../lib/custom-names.js";
 
 interface McpConfigOptions {
   workerUrl: string;
@@ -33,18 +34,8 @@ export function generateMcpConfig(options: McpConfigOptions): void {
     mcpConfig.mcpServers = {};
   }
 
-  // Don't overwrite existing line-harness config — use a unique name
-  let serverName = "line-harness";
-  if (mcpConfig.mcpServers["line-harness"]) {
-    // Extract a short suffix from the API key
-    const suffix = options.apiKey.slice(0, 8);
-    serverName = `line-harness-${suffix}`;
-    p.log.info(
-      `既存の line-harness 設定があるため、${serverName} として追加します`,
-    );
-  }
-  mcpConfig.mcpServers[serverName] = newServerConfig;
+  mcpConfig.mcpServers[CUSTOM_MCP_SERVER_NAME] = newServerConfig;
 
   writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + "\n");
-  p.log.success(`.mcp.json に MCP 設定を追加しました（${serverName}）`);
+  p.log.success(`.mcp.json に MCP 設定を追加しました（${CUSTOM_MCP_SERVER_NAME}）`);
 }

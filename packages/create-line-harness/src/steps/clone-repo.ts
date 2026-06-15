@@ -1,13 +1,13 @@
 import * as p from "@clack/prompts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { tmpdir } from "node:os";
 import { execa } from "execa";
 import { repoPnpm } from "../lib/pnpm.js";
 import {
   CUSTOM_SOURCE_COMMIT,
   CUSTOM_SOURCE_REPOSITORY_URL,
 } from "../lib/source.js";
+import { getCustomLocalRepoDir } from "../lib/custom-names.js";
 
 interface GitResult {
   stdout: string;
@@ -147,10 +147,7 @@ export async function ensureRepo(repoDir: string | null): Promise<string> {
   }
 
   // Check standard install location.
-  const homeDir = join(
-    process.env.HOME || process.env.USERPROFILE || tmpdir(),
-    ".line-harness",
-  );
+  const homeDir = getCustomLocalRepoDir();
   if (existsSync(join(homeDir, "pnpm-workspace.yaml"))) {
     const s = p.spinner();
     s.start("固定済みの改造版ソースを確認中...");

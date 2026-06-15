@@ -4,6 +4,10 @@ import { readFileSync, writeFileSync, existsSync, rmSync, unlinkSync } from "nod
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
+import {
+  getCustomInstallConfigPath,
+  getCustomSetupStatePath,
+} from "../lib/custom-names.js";
 import { checkDeps } from "../steps/check-deps.js";
 import { ensureAuth, getAccountId } from "../steps/auth.js";
 import { promptLineCredentials } from "../steps/prompt.js";
@@ -66,7 +70,7 @@ const ACCOUNT_DEPENDENT_STEPS = [
 ];
 
 function getStatePath(repoDir: string): string {
-  return join(repoDir, ".line-harness-setup.json");
+  return getCustomSetupStatePath(repoDir);
 }
 
 function loadState(repoDir: string): SetupState {
@@ -149,7 +153,7 @@ function restoreWranglerToml(state: SetupState, repoDir: string): void {
   try {
     writeFileSync(tomlPath, state.originalWranglerToml);
   } catch {
-    // Best effort — user can `git -C ~/.line-harness checkout apps/worker/wrangler.toml`.
+    // Best effort — user can `git -C ~/.line-harness-custom checkout apps/worker/wrangler.toml`.
   }
 }
 
@@ -815,7 +819,7 @@ ON CONFLICT(channel_id) DO UPDATE SET
   // Writes BOTH legacy field names (for older update.ts versions) and the
   // new Task 22 names for compatibility. Automatic updates are disabled in
   // the initial custom release, so no manifest URL is written here.
-  const configPath = join(repoDir, ".line-harness-config.json");
+  const configPath = getCustomInstallConfigPath(repoDir);
   const adminPublicUrl = state.adminUrl;
   const workerPublicUrl = state.workerUrl;
   const fullConfig: Record<string, unknown> = {

@@ -1,7 +1,6 @@
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import { Readable } from "node:stream";
 import {
   fetchManifest,
@@ -18,9 +17,10 @@ import {
   type CurrentVersion,
 } from "@line-harness/update-engine";
 import { configureAdminAuth } from "../steps/admin-auth.js";
+import { getCustomInstallConfigPath } from "../lib/custom-names.js";
 
 /**
- * Shape of `.line-harness-config.json` written by `setup.ts` after
+ * Shape of `.line-harness-custom-config.json` written by `setup.ts` after
  * a successful install. Older installs may be missing newer fields
  * (e.g. `cfApiToken`, `liffProject`, public URLs) — the update flow
  * surfaces a clear error in that case rather than guessing.
@@ -55,7 +55,7 @@ export function isUpdateEnabled(): boolean {
 }
 
 export function loadState(repoDir: string): SetupState | null {
-  const configPath = join(repoDir, ".line-harness-config.json");
+  const configPath = getCustomInstallConfigPath(repoDir);
   if (!existsSync(configPath)) return null;
   try {
     return JSON.parse(readFileSync(configPath, "utf-8")) as SetupState;
@@ -160,7 +160,7 @@ function resolveState(
 }
 
 /**
- * Interactively fill in fields missing from `.line-harness-config.json`
+ * Interactively fill in fields missing from `.line-harness-custom-config.json`
  * (legacy installs that pre-date Task 22) and persist them back to the
  * file so we don't ask again. The returned state has the new fields
  * merged in but is otherwise the original on-disk object.
@@ -172,7 +172,7 @@ function resolveState(
  * For the rest the user has to paste in the value from the CF dashboard.
  *
  * `cfApiToken` is NOT prompted — it must come from CLOUDFLARE_API_TOKEN
- * env because secrets don't belong in `.line-harness-config.json` (which
+ * env because secrets don't belong in `.line-harness-custom-config.json` (which
  * gets committed by some operators).
  */
 async function promptForMissingFields(
@@ -188,7 +188,7 @@ async function promptForMissingFields(
 
   p.log.warn(
     [
-      "`.line-harness-config.json` に不足フィールドがあります。",
+      "`.line-harness-custom-config.json` に不足フィールドがあります。",
       "v0.1.19 以前にセットアップした環境では新しいフィールドが書き込まれていません。",
       "値を入力すると設定ファイルに保存され、次回以降は聞かれません。",
     ].join("\n"),
@@ -398,11 +398,11 @@ export async function runUpdate(repoDir: string): Promise<void> {
     process.exit(1);
   }
 
-  const configPath = join(repoDir, ".line-harness-config.json");
+  const configPath = getCustomInstallConfigPath(repoDir);
   let state = loadState(repoDir);
   if (!state) {
     p.cancel(
-      ".line-harness-config.json が見つかりません。先に `npx create-line-harness` でセットアップしてください。",
+      ".line-harness-custom-config.json が見つかりません。先に `npx create-line-harness` でセットアップしてください。",
     );
     process.exit(1);
   }

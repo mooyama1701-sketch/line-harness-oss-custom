@@ -4,7 +4,7 @@
 
 - 最終更新日：2026-06-15
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名とMCP登録名の分離を実装済み。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -62,10 +62,11 @@
 - 初期リリースでの自動update無効化
 - 改造版ソースの固定参照（暫定commit）
 - Cloudflare同名リソース時の停止処理（実Cloudflare環境ではなくmockで検証）
+- 改造版専用ローカル設定名の分離（`~/.line-harness-custom`、`.line-harness-custom-setup.json`、`.line-harness-custom-config.json`）
+- MCP登録名の分離（`.mcp.json` に `line-harness-custom` として追加）
 
 未完了：
 
-- 改造版専用ローカル設定名
 - 改造版専用package/MCP名
 - 新規環境でのインストール試験
 
@@ -76,7 +77,7 @@
 ## 次に行う作業
 
 1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
-2. 改造版専用ローカル設定名、package/MCP名の設計を進める
+2. 改造版専用package名、CLI bin名、MCP package/bin名、MCP内部server名の設計を進める
 3. 新規環境でのインストール試験計画を具体化する
 
 ## 現在のローカル環境
@@ -163,7 +164,7 @@
 
 ## 次回Codexへ依頼する作業
 
-次は、初期リリース直前にsetup用clone元の固定commitを最終commitへ更新してください。あわせて、改造版専用ローカル設定名、package/MCP名、新規環境でのインストール試験計画を具体化してください。
+次は、初期リリース直前にsetup用clone元の固定commitを最終commitへ更新してください。あわせて、改造版専用package名、CLI bin名、MCP package/bin名、MCP内部server名、新規環境でのインストール試験計画を具体化してください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 

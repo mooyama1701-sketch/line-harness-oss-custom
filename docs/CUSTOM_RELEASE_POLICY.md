@@ -10,7 +10,7 @@
 - 固定commitは初期リリース直前に最終更新する。
 - Cloudflareの既存Worker、D1、R2、Pagesは再利用・上書きしない。
 - 同名リソースが存在する場合は停止する。
-- 公式版と改造版のローカル設定は将来分離する。
+- 公式版と改造版のローカル設定は分離する。
 - package名とMCP名は改造版専用名へ将来分離する。
 - 本番deployは実装・検証とは別タスクで行う。
 - 実績、数値、URL、認証情報は推測や捏造をしない。
@@ -42,4 +42,6 @@
 - 固定commitは初期リリース直前に最終更新が必要。
 - Cloudflare同名リソース停止は実装済み。Worker、Pages project、D1 database、R2 bucketの同名検出時は、作成・更新・deploy・migration前にsetupを停止する。
 - Cloudflare同名リソース停止は実Cloudflare環境ではなくmockで検証済み。
-- package名、設定名、MCP名は未確定。
+- ローカルclone先は `~/.line-harness-custom`、setup stateは `.line-harness-custom-setup.json`、install configは `.line-harness-custom-config.json` へ分離済み。
+- MCP登録名は `line-harness-custom` へ分離済み。公式版の `line-harness` 登録は読込・変更・削除しない。
+- package名、CLI bin名、MCP package名、MCP bin名、MCP内部server名は未確定。
