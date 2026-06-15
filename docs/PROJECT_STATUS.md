@@ -60,10 +60,10 @@
 - Build Fingerprint
 - Worker再deploy時のCORS Variables保護
 - 初期リリースでの自動update無効化
+- 改造版ソースの固定参照（暫定commit）
 
 未完了：
 
-- 改造版ソースの固定参照
 - Cloudflare同名リソース時の停止処理
 - 改造版専用ローカル設定名
 - 改造版専用package/MCP名
@@ -75,8 +75,8 @@
 
 ## 次に行う作業
 
-1. 次のP0作業として、setup用clone元を改造版の固定tagまたはcommit SHAへ変更する
-2. Cloudflare同名リソース時の停止処理を設計・実装する
+1. 次のP0作業として、Cloudflare同名リソース時の停止処理を設計・実装する
+2. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
 3. 改造版専用ローカル設定名、package/MCP名の設計を進める
 4. 新規環境でのインストール試験計画を具体化する
 
@@ -164,7 +164,7 @@
 
 ## 次回Codexへ依頼する作業
 
-次は、改造版初期リリースに向けて `packages/create-line-harness` のsetup用clone元を改造版の固定tagまたはcommit SHAへ変更し、公式ソースへ戻る経路を閉じてください。
+次は、改造版初期リリースに向けてCloudflare同名リソース時の停止処理を設計・実装してください。setup用clone元の固定commitは暫定値のため、初期リリース直前に最終commitへ更新してください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 

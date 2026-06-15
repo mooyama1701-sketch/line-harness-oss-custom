@@ -122,7 +122,7 @@ function applyPatchedConfig(
   if (!existsSync(tomlPath)) return;
   // Capture the pristine file the FIRST time we patch (before our
   // substitution touches it), so we can restore it on exit and not pollute
-  // future `git pull --ff-only` runs.
+  // future fixed-commit checkout runs.
   if (state.originalWranglerToml === undefined) {
     state.originalWranglerToml = readFileSync(tomlPath, "utf-8");
   }
@@ -300,8 +300,8 @@ export async function runSetup(repoDir: string): Promise<void> {
   // Resume hygiene: a previous (possibly aborted) run may have left
   // wrangler.toml patched and cached the now-stale baseline in state.json.
   // Roll the file back to that baseline first, then forget it — the next
-  // applyPatchedConfig() will re-capture the current (possibly git-pulled)
-  // version. Without this, resuming overwrites a freshly-pulled toml with
+  // applyPatchedConfig() will re-capture the current pinned source version.
+  // Without this, resuming overwrites the pinned toml with
   // the stale snapshot.
   if (state.originalWranglerToml !== undefined) {
     restoreWranglerToml(state, repoDir);
@@ -313,8 +313,8 @@ export async function runSetup(repoDir: string): Promise<void> {
   // inside runSetupInner can call it too. Centralise restore + persist into
   // one helper so every exit path runs it before exiting.
   // Critically: also clear originalWranglerToml in state so a future rerun
-  // (after `git pull` may have updated apps/worker/wrangler.toml) does NOT
-  // restore yesterday's snapshot over today's freshly-pulled file.
+  // (after the source pin may have updated apps/worker/wrangler.toml) does NOT
+  // restore yesterday's snapshot over today's pinned file.
   const cleanupFailure = (): void => {
     restoreWranglerToml(state, repoDir);
     state.originalWranglerToml = undefined;
@@ -327,7 +327,7 @@ export async function runSetup(repoDir: string): Promise<void> {
   };
 
   // Best-effort restore on SIGINT (Ctrl-C). Without this the user's repo
-  // is left dirty and `ensureRepo()` next time can't ff-only.
+  // is left dirty and `ensureRepo()` next time can't checkout the pinned source.
   const onSignal = (sig: NodeJS.Signals) => {
     cleanupFailure();
     process.exit(sig === "SIGINT" ? 130 : 143);
