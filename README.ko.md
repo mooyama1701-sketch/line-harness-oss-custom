@@ -40,7 +40,7 @@ Cloudflare 무료 플랜에서 동작. **서버 비용 0원**. Claude Code 에�
 ### 명령어 한 줄로 전체 셋업
 
 ```bash
-npx create-line-harness
+npx @airestart/create-line-harness
 ```
 
 CLI 가 다음을 모두 처리합니다:
@@ -125,7 +125,7 @@ CLI 가 다음을 모두 처리합니다:
 - **Packages**:
   - `@line-harness/sdk` — TypeScript SDK
   - `@line-harness/mcp-server` — Claude Code 용 MCP 서버
-  - `create-line-harness` — 셋업 CLI
+  - `@airestart/create-line-harness` / `create-line-harness-custom` — 셋업 CLI
   - `@line-harness/plugin-template` — 플러그인 확장 템플릿
   - `@line-harness/db` — D1 migration + 헬퍼
   - `@line-harness/line-sdk` — LINE API 얇은 래퍼
@@ -139,7 +139,7 @@ CLI 가 다음을 모두 처리합니다:
 - [LINE 에서 데모 체험](https://shudesu.github.io/line-harness-oss/)
 - [npm: @line-harness/sdk](https://www.npmjs.com/package/@line-harness/sdk)
 - [npm: @line-harness/mcp-server](https://www.npmjs.com/package/@line-harness/mcp-server)
-- [npm: create-line-harness](https://www.npmjs.com/package/create-line-harness)
+- [npm: @airestart/create-line-harness](https://www.npmjs.com/package/@airestart/create-line-harness)
 
 ---
 

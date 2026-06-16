@@ -14,11 +14,11 @@ Options:
   -h, --help               Show this help
 
 Examples:
-  scripts/run-create-line-harness-sandbox.sh --name repro-20260521 -- npx create-line-harness
+  scripts/run-create-line-harness-sandbox.sh --name repro-20260521 -- npx @airestart/create-line-harness
   scripts/run-create-line-harness-sandbox.sh --name repro-20260521 --reuse-wrangler-auth
 
 What this isolates:
-  - ~/.line-harness clone + setup state
+  - ~/.line-harness-custom clone + setup state
   - wrangler config/cache under HOME / XDG
   - npm/pnpm/corepack cache + user config
   - working directory for the npx command
@@ -160,7 +160,7 @@ echo "  sandbox home: $SANDBOX_HOME"
 echo "  working dir : $SANDBOX_WORK"
 echo
 echo "Safety reminders:"
-echo "  - Local ~/.line-harness and wrangler state are isolated from your real HOME."
+echo "  - Local ~/.line-harness-custom and wrangler state are isolated from your real HOME."
 echo "  - Cloudflare / LINE resources are NOT isolated unless you use a separate account"
 echo "    or a unique project name and test channel."
 echo

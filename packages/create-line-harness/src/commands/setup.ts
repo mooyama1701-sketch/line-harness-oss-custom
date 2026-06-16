@@ -50,7 +50,7 @@ interface SetupState {
    * Pristine apps/worker/wrangler.toml content captured before we started
    * substituting account/database IDs. Restored on exit so the cloned repo
    * stays git-clean. Persisted in state.json so SIGINT mid-run + later
-   * `npx create-line-harness` resume still has the right baseline.
+   * `npx @airestart/create-line-harness` resume still has the right baseline.
    */
   originalWranglerToml?: string;
   completedSteps: string[];
@@ -676,7 +676,7 @@ ON CONFLICT(channel_id) DO UPDATE SET
     if (insertErr) {
       s.stop(`LINE アカウント登録に失敗: ${insertErr instanceof Error ? insertErr.message : String(insertErr)}`);
       p.log.error(
-        `D1 への直接書き込みに失敗しました。'npx create-line-harness@latest' を再実行してください。`,
+        `D1 への直接書き込みに失敗しました。'npx @airestart/create-line-harness@latest' を再実行してください。`,
       );
       saveState(repoDir, state);
       process.exit(1);

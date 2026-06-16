@@ -36,7 +36,7 @@ export class WranglerError extends Error {
     }
     if (text.includes("non-interactive") || text.includes("cloudflare_api_token")) {
       hints.push(
-        "wrangler が CI モード判定に陥っています（TTY 不在）。create-line-harness 側のバグの可能性が高いので、Issue で報告してください。",
+        "wrangler が CI モード判定に陥っています（TTY 不在）。create-line-harness-custom 側のバグの可能性が高いので、Issue で報告してください。",
       );
     }
     if (text.includes("d1_create_too_many_databases") || text.includes("too many databases")) {

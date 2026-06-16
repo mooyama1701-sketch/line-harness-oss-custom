@@ -402,7 +402,7 @@ export async function runUpdate(repoDir: string): Promise<void> {
   let state = loadState(repoDir);
   if (!state) {
     p.cancel(
-      ".line-harness-custom-config.json が見つかりません。先に `npx create-line-harness` でセットアップしてください。",
+      ".line-harness-custom-config.json が見つかりません。先に `npx @airestart/create-line-harness` でセットアップしてください。",
     );
     process.exit(1);
   }

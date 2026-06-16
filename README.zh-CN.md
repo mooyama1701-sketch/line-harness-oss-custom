@@ -40,7 +40,7 @@
 ### 一条命令完成全部配置
 
 ```bash
-npx create-line-harness
+npx @airestart/create-line-harness
 ```
 
 CLI 自动完成以下全部步骤：
@@ -125,7 +125,7 @@ CLI 自动完成以下全部步骤：
 - **Packages**:
   - `@line-harness/sdk` — TypeScript SDK
   - `@line-harness/mcp-server` — Claude Code 用 MCP server
-  - `create-line-harness` — 配置 CLI
+  - `@airestart/create-line-harness` / `create-line-harness-custom` — 配置 CLI
   - `@line-harness/plugin-template` — 插件扩展模板
   - `@line-harness/db` — D1 migration 与辅助函数
   - `@line-harness/line-sdk` — LINE API 薄封装
@@ -139,7 +139,7 @@ CLI 自动完成以下全部步骤：
 - [在 LINE 上免费体验](https://shudesu.github.io/line-harness-oss/)
 - [npm: @line-harness/sdk](https://www.npmjs.com/package/@line-harness/sdk)
 - [npm: @line-harness/mcp-server](https://www.npmjs.com/package/@line-harness/mcp-server)
-- [npm: create-line-harness](https://www.npmjs.com/package/create-line-harness)
+- [npm: @airestart/create-line-harness](https://www.npmjs.com/package/@airestart/create-line-harness)
 
 ---
 

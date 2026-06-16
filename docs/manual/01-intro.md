@@ -54,7 +54,7 @@ Lstep / Utage との違いは 4 軸で整理できます。
 
 ## 次の章
 
-第 2 章では `npx create-line-harness` を使って、最短ルートで自分の LINE Harness を立ち上げます。
+第 2 章では `npx @airestart/create-line-harness` を使って、最短ルートで自分の LINE Harness を立ち上げます。
 
 ---
 *このファイルはプレースホルダーです。目次以下の本文・図版は別セッションで執筆します。*

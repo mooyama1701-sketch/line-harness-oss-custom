@@ -31,7 +31,7 @@ async function main(): Promise<void> {
     await runSetup(repoDir);
   } else {
     console.error(`Unknown command: ${command}`);
-    console.error("Usage: create-line-harness [setup|update] [--repo-dir <path>]");
+    console.error("Usage: create-line-harness-custom [setup|update] [--repo-dir <path>]");
     process.exit(1);
   }
 }

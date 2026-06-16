@@ -40,7 +40,7 @@ Runs on Cloudflare's free tier. **$0/month server cost.** Fully operable from Cl
 ### One-command setup
 
 ```bash
-npx create-line-harness
+npx @airestart/create-line-harness
 ```
 
 The CLI handles everything:
@@ -125,7 +125,7 @@ Takes about 5 minutes. Once done, the dashboard at `https://<your-name>-admin.pa
 - **Packages**:
   - `@line-harness/sdk` — TypeScript SDK
   - `@line-harness/mcp-server` — MCP server for Claude Code
-  - `create-line-harness` — setup CLI
+  - `@airestart/create-line-harness` / `create-line-harness-custom` — setup CLI
   - `@line-harness/plugin-template` — plugin extension template
   - `@line-harness/db` — D1 migrations + helpers
   - `@line-harness/line-sdk` — thin LINE API wrapper
@@ -139,7 +139,7 @@ Takes about 5 minutes. Once done, the dashboard at `https://<your-name>-admin.pa
 - [Live demo on LINE](https://shudesu.github.io/line-harness-oss/)
 - [npm: @line-harness/sdk](https://www.npmjs.com/package/@line-harness/sdk)
 - [npm: @line-harness/mcp-server](https://www.npmjs.com/package/@line-harness/mcp-server)
-- [npm: create-line-harness](https://www.npmjs.com/package/create-line-harness)
+- [npm: @airestart/create-line-harness](https://www.npmjs.com/package/@airestart/create-line-harness)
 
 ---
 

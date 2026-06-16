@@ -20,7 +20,7 @@ LINE Harness は、L社（Lstep）/ U社（Utage）の代替を狙う OSS の LI
 | # | タイトル | tier | 概要 |
 |---|---|---|---|
 | 1 | [イントロ](./01-intro.md) | 無料 | LINE Harness とは / Lstep・Utage との比較 |
-| 2 | [セットアップ](./02-setup.md) | 無料 | `npx create-line-harness` / LIFF / Mac Mini 複アカ運用 |
+| 2 | [セットアップ](./02-setup.md) | 無料 | `npx @airestart/create-line-harness` / LIFF / Mac Mini 複アカ運用 |
 | 3 | [基本機能](./03-basics.md) | 無料 | 友だち管理・配信・自動応答・リッチメニュー |
 | 4 | [キャンペーン設計](./04-campaign-design.md) | 🔒 有料 | トラッキング前提の獲得設計、診断 → セグメント |
 | 5 | [運用フロー](./05-operations.md) | 🔒 有料 | 週次 A/B テスト、BAN 対策、配信ガバナンス |

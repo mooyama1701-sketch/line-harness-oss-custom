@@ -38,13 +38,13 @@ if (userAgent.includes("pnpm/")) {
 
 console.error(
   [
-    "Refusing to publish create-line-harness from source with npm.",
+    `Refusing to publish ${packageJson.name} from source with npm.`,
     "This package still contains workspace: dependency specs that npm would publish verbatim:",
     ...workspaceSpecs.map((entry) => `  - ${entry}`),
     "",
     "Use one of these flows instead:",
     "  1. pnpm publish --access public --no-git-checks",
-    "  2. pnpm pack --pack-destination <dir> && npm publish <dir>/create-line-harness-<version>.tgz --access public",
+    `  2. pnpm pack --pack-destination <dir> && npm publish <dir>/${packageJson.name.replace("/", "-").replace("@", "")}-<version>.tgz --access public`,
     "",
     "Set LINE_HARNESS_ALLOW_SOURCE_PUBLISH=1 only if you intentionally want to bypass this guard.",
   ].join("\n"),
