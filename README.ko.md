@@ -152,9 +152,8 @@ MIT License. 상업적 이용, 수정, 재배포 자유. 자세한 내용은 [LI
 원본 저장소는 [`Shudesu/line-harness-oss`](https://github.com/Shudesu/line-harness-oss)
 입니다. 원본 OSS 크레딧 `LINE Harness by @Shudesu`를 유지합니다.
 
-MIT License의 저작권 표기는 현재
-`Copyright (c) 2026 Shudesu and LINE Harness contributors`를 사용합니다. 이 문구는
-원저자 확인 중이며, 확인 결과에 따라 공개 전에 업데이트될 수 있습니다.
+MIT License의 저작권 표기는 원저자가 확인한
+`Copyright (c) 2026 Shudesu and LINE Harness contributors`를 사용합니다.
 
 ---
 

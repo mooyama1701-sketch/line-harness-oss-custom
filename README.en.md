@@ -153,10 +153,8 @@ This repository is a custom distribution based on the original OSS project
 [`Shudesu/line-harness-oss`](https://github.com/Shudesu/line-harness-oss). The
 original OSS credit, `LINE Harness by @Shudesu`, is preserved.
 
-The MIT License currently uses the copyright notice
-`Copyright (c) 2026 Shudesu and LINE Harness contributors`. This wording is
-pending confirmation with the original author and may be updated before
-publication.
+The MIT License uses the copyright notice confirmed by the original author:
+`Copyright (c) 2026 Shudesu and LINE Harness contributors`.
 
 ---
 

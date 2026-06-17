@@ -151,9 +151,8 @@ MIT License. 可自由用于商业用途、修改和再分发。详情请参阅 
 [`Shudesu/line-harness-oss`](https://github.com/Shudesu/line-harness-oss)。保留原 OSS
 署名 `LINE Harness by @Shudesu`。
 
-MIT License 目前使用的版权声明为
-`Copyright (c) 2026 Shudesu and LINE Harness contributors`。该表述仍在向原作者确认中，
-可能会在发布前根据确认结果更新。
+MIT License 使用已由原作者确认的版权声明：
+`Copyright (c) 2026 Shudesu and LINE Harness contributors`。
 
 ---
 

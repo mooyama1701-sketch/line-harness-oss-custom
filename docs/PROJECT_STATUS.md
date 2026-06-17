@@ -52,6 +52,7 @@
 - [x] Fork運用資料 `docs/FORK_CLOUDFLARE_WORKFLOW.md` にWorker CORS Variablesのrepo Variables説明を追加
 - [x] 改造版初期リリース向けP0対応として、自動update無効化を検証し、正式取り込み可能と判断
 - [x] 初期リリース向けにroot `LICENSE` / `NOTICE` と公開対象npm packageへの `LICENSE` / `NOTICE` 同梱を整備
+- [x] MIT License著作権表示 `Copyright (c) 2026 Shudesu and LINE Harness contributors` が元作者確認済み
 
 初期リリース準備状況：
 
@@ -73,11 +74,11 @@
 - root `LICENSE` / `NOTICE` の追加
 - 公開対象npm packageへの `LICENSE` / `NOTICE` 同梱
 - READMEへの元OSSクレジットと改造版説明の追記
+- MIT License著作権表示の元作者確認
 
 未完了：
 
 - 新規環境でのインストール試験
-- MIT License著作権表示の元作者確認
 
 ## 現在進行中の作業
 
@@ -152,12 +153,10 @@
 - テスト用LINE公式アカウントの準備状況
 - 実Cloudflare環境で、Worker secretsとplain varsが同名で存在する場合の最終的な優先順位
 - 公式CLI `0.1.25`とnpm公開済み`0.1.24`のどちらをインストーラー調査基準にするか
-- MIT License著作権表示の元作者確認後の最終表記
 
 ## ブロッカー
 
 - テスト用Cloudflare環境とテスト用LINE公式アカウントの準備状況が未確認
-- MIT License著作権表示の元作者確認が完了するまで、npmでの正式公開は行わない
 
 ## 現在確認しているリスク
 
@@ -165,13 +164,13 @@
 - 仮名称が多く、公開前に正式名称を決める必要がある
 - setup処理でCloudflare同名リソース時の停止処理はmock検証済みだが、実Cloudflare環境でのread-only確認は未実施
 - 本番環境と検証環境の分離を徹底しないと、CloudflareやLINE設定へ影響する可能性がある
-- 改造版にはroot `LICENSE` と `NOTICE` を追加済み。ただしMIT License著作権表示は元作者確認中のため、確認完了までnpmでの正式公開は行わない。
+- 改造版にはroot `LICENSE` と `NOTICE` を追加済み。MIT License著作権表示は元作者確認済み。
 - 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があったが、改造版setupでは同名Worker、Pages project、D1 database、R2 bucketを検出した場合に作成・更新・deploy・migration前に停止するよう変更済み
 - 公式update機能は公式release-manifestを参照するため、改造版初期版では自動更新を実行させず、未対応案内を表示して終了させる対応を検証済み。正式取り込み後も、将来updateを復活させる場合は改造版manifest設計が必要。
 
 ## 次回Codexへ依頼する作業
 
-次は、MIT License著作権表示の元作者確認と、新規環境でのインストール試験計画を具体化してください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
+次は、新規環境でのインストール試験計画を具体化してください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 
