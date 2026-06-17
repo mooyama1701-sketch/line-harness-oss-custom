@@ -54,7 +54,7 @@ three environment variables (see
 
 **(a) Cross-site Pages ↔ Workers (default).** Set
 `ADMIN_ORIGIN=https://<admin>.pages.dev` and `ADMIN_ALLOW_CROSS_SITE=true`.
-`create-line-harness` does this automatically after deploying the admin.
+The custom setup CLI (`npx @airestart/create-line-harness`) does this automatically after deploying the admin.
 Cookies are `SameSite=None; Secure`; CSRF protects mutations; CORS is locked to
 the allowlist.
 

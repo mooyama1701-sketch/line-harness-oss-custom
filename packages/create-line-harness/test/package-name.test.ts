@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const packageDir = join(process.cwd(), "packages/create-line-harness");
+const customSetupCommand = "npx @airestart/create-line-harness";
+const legacyPublishedCommand = "npx create-line-harness@latest";
 
 describe("custom setup package metadata", () => {
   it("uses the custom npm package and CLI bin names", () => {
@@ -51,5 +53,23 @@ describe("custom setup package metadata", () => {
     expect(stderr).not.toContain(
       "npm publish <dir>/create-line-harness-<version>.tgz",
     );
+  });
+
+  it("uses the custom setup command in user-facing setup surfaces", () => {
+    const userFacingFiles = [
+      "apps/worker/src/routes/setup.ts",
+      "docs/FORK_CLOUDFLARE_WORKFLOW.md",
+      "docs/ADMIN-AUTH.md",
+    ];
+
+    for (const filePath of userFacingFiles) {
+      const source = readFileSync(join(process.cwd(), filePath), "utf-8");
+
+      expect(source, filePath).toContain(customSetupCommand);
+      expect(source, filePath).not.toContain(legacyPublishedCommand);
+      expect(source, filePath).not.toContain(
+        "`create-line-harness` does this automatically",
+      );
+    }
   });
 });

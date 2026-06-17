@@ -38,7 +38,7 @@ npx wrangler login
 4. セットアップ CLI を実行
 
 ```bash
-npx create-line-harness@latest
+npx @airestart/create-line-harness
 ```
 
 CLI は Cloudflare Workers、D1、R2、Pages を前提にセットアップします。

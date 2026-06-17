@@ -311,7 +311,7 @@ setup.get('/setup', (c) => {
     <div class="command-section">
       <h2>実行コマンド</h2>
       <div class="command-box">
-        <div class="command-preview">$ npx create-line-harness@latest</div>
+        <div class="command-preview">$ npx @airestart/create-line-harness</div>
         <button class="copy-btn" onclick="copyCommand()">コピー</button>
       </div>
       <div class="copy-feedback" id="copy-feedback"></div>
@@ -329,7 +329,7 @@ function switchTab(tab) {
 }
 
 function copyCommand() {
-  var command = 'npx create-line-harness@latest';
+  var command = 'npx @airestart/create-line-harness';
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(command).then(function() {
       showFeedback();
