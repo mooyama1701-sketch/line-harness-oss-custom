@@ -13,6 +13,8 @@
     }
   },
   "files": [
+    "LICENSE",
+    "NOTICE",
     "dist",
     "src",
     "README.md"

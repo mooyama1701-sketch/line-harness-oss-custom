@@ -1,6 +1,7 @@
 {
   "name": "@airestart/line-harness-mcp-server",
   "version": "0.15.0",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "line-harness-custom-mcp": "./dist/index.js"

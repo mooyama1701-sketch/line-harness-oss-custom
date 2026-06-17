@@ -1,0 +1,19 @@
+LINE Harness Custom Notice
+
+This repository and the npm packages in this workspace are a custom
+distribution of LINE Harness.
+
+Original project: LINE Harness
+Original repository: https://github.com/Shudesu/line-harness-oss
+Original credit: LINE Harness by @Shudesu
+License: MIT License
+
+This custom distribution preserves the original OSS credit and includes
+modifications for the custom initial release. The copyright notice currently
+used for the MIT License is:
+
+Copyright (c) 2026 Shudesu and LINE Harness contributors
+
+This copyright wording is pending confirmation with the original author. If the
+confirmed wording differs, update LICENSE, NOTICE, package-level LICENSE/NOTICE
+files, README files, and release documentation before publication.

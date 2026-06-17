@@ -145,7 +145,18 @@ Takes about 5 minutes. Once done, the dashboard at `https://<your-name>-admin.pa
 
 ## License
 
-MIT License. Free for commercial use, modification, and redistribution.
+MIT License. Free for commercial use, modification, and redistribution. See
+[LICENSE](LICENSE) for details.
+
+This repository is a custom distribution based on the original OSS project
+`LINE Harness`. The original repository is
+[`Shudesu/line-harness-oss`](https://github.com/Shudesu/line-harness-oss). The
+original OSS credit, `LINE Harness by @Shudesu`, is preserved.
+
+The MIT License currently uses the copyright notice
+`Copyright (c) 2026 Shudesu and LINE Harness contributors`. This wording is
+pending confirmation with the original author and may be updated before
+publication.
 
 ---
 

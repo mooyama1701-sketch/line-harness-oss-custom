@@ -145,7 +145,15 @@ CLI 自动完成以下全部步骤：
 
 ## 许可证
 
-MIT License. 商用、修改、再分发自由。
+MIT License. 可自由用于商业用途、修改和再分发。详情请参阅 [LICENSE](LICENSE)。
+
+本仓库是基于原 OSS 项目 `LINE Harness` 的改造版。原仓库是
+[`Shudesu/line-harness-oss`](https://github.com/Shudesu/line-harness-oss)。保留原 OSS
+署名 `LINE Harness by @Shudesu`。
+
+MIT License 目前使用的版权声明为
+`Copyright (c) 2026 Shudesu and LINE Harness contributors`。该表述仍在向原作者确认中，
+可能会在发布前根据确认结果更新。
 
 ---
 

@@ -12,6 +12,8 @@
 - 同名リソースが存在する場合は停止する。
 - 公式版と改造版のローカル設定は分離する。
 - setup package名、CLI bin名、MCP package名、MCP bin名、MCP内部server名は改造版専用名へ分離する。
+- root `LICENSE` と `NOTICE` を同梱し、npm公開対象packageにもMIT License本文と元OSSクレジットを含める。
+- MIT Licenseの著作権表示は、元作者への確認が完了するまで暫定表記として扱う。
 - 本番deployは実装・検証とは別タスクで行う。
 - 実績、数値、URL、認証情報は推測や捏造をしない。
 
@@ -29,6 +31,7 @@
 - npm package名の分離
 - MCP package・server名の分離
 - 安全設計のテスト追加
+- LICENSE本文と元OSSクレジットのnpm package同梱
 
 ### P2
 
@@ -46,3 +49,5 @@
 - MCP登録名は `line-harness-custom` へ分離済み。公式版の `line-harness` 登録は読込・変更・削除しない。
 - setup package名は `@airestart/create-line-harness`、CLI bin名は `create-line-harness-custom` へ分離済み。
 - MCP package名は `@airestart/line-harness-mcp-server`、MCP bin名は `line-harness-custom-mcp`、MCP内部server名は `line-harness-custom` へ分離済み。
+- root `LICENSE` と `NOTICE` を追加済み。公開対象npm packageにも `LICENSE` と `NOTICE` を同梱する方針。
+- MIT Licenseの著作権表示は `Copyright (c) 2026 Shudesu and LINE Harness contributors` を使用中。ただし元作者への確認中であり、確認結果に応じて公開前に更新する。

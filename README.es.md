@@ -145,7 +145,18 @@ Tarda unos 5 minutos. Al finalizar, el panel en `https://<your-name>-admin.pages
 
 ## Licencia
 
-Licencia MIT. Libre para uso comercial, modificación y redistribución.
+Licencia MIT. Libre para uso comercial, modificación y redistribución. Consulta
+[LICENSE](LICENSE) para más detalles.
+
+Este repositorio es una distribución modificada basada en el proyecto OSS
+original `LINE Harness`. El repositorio original es
+[`Shudesu/line-harness-oss`](https://github.com/Shudesu/line-harness-oss). Se
+mantiene el crédito original del OSS: `LINE Harness by @Shudesu`.
+
+La licencia MIT usa actualmente el aviso de copyright
+`Copyright (c) 2026 Shudesu and LINE Harness contributors`. Esta redacción está
+pendiente de confirmación con el autor original y puede actualizarse antes de
+la publicación.
 
 ---
 
