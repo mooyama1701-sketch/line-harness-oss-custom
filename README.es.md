@@ -98,7 +98,7 @@ Tarda unos 5 minutos. Al finalizar, el panel en `https://<your-name>-admin.pages
 - **Pools de tráfico** — distribución automática entre varias cuentas
 
 ### Integración con IA
-- **MCP server incluido** (`@line-harness/mcp-server`) — operación en lenguaje natural desde Claude Code
+- **MCP server incluido** (`@airestart/line-harness-mcp-server` / `line-harness-custom-mcp`) — operación en lenguaje natural desde Claude Code
   - `list_conversations` / `get_conversation` — la IA monitorea conversaciones sin responder
   - `create_scenario` / `update_step` — deja que la IA diseñe escenarios
   - `broadcast` / `send_message` — los envíos requieren confirmación del usuario
@@ -124,7 +124,7 @@ Tarda unos 5 minutos. Al finalizar, el panel en `https://<your-name>-admin.pages
 - **Web** (`apps/web`): panel Next.js 15 (19 secciones)
 - **Packages**:
   - `@line-harness/sdk` — SDK TypeScript
-  - `@line-harness/mcp-server` — MCP server para Claude Code
+  - `@airestart/line-harness-mcp-server` / `line-harness-custom-mcp` — MCP server para Claude Code
   - `@airestart/create-line-harness` / `create-line-harness-custom` — CLI de configuración
   - `@line-harness/plugin-template` — plantilla de extensión por plugins
   - `@line-harness/db` — migraciones D1 + helpers
@@ -138,7 +138,7 @@ Tarda unos 5 minutos. Al finalizar, el panel en `https://<your-name>-admin.pages
 - [Tutorial de configuración (video)](https://youtu.be/DiRuGaeq1sM)
 - [Demo en vivo en LINE](https://shudesu.github.io/line-harness-oss/)
 - [npm: @line-harness/sdk](https://www.npmjs.com/package/@line-harness/sdk)
-- [npm: @line-harness/mcp-server](https://www.npmjs.com/package/@line-harness/mcp-server)
+- [npm: @airestart/line-harness-mcp-server](https://www.npmjs.com/package/@airestart/line-harness-mcp-server)
 - [npm: @airestart/create-line-harness](https://www.npmjs.com/package/@airestart/create-line-harness)
 
 ---

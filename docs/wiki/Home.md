@@ -43,7 +43,7 @@ LINE Harness は、LINE公式アカウント向けのオープンソース CRM /
 | LIFF | Vite + vanilla TypeScript |
 | LINE連携 | 自作型付きSDK (@line-crm/line-sdk) |
 | SDK | @line-harness/sdk (npm publish対応) |
-| MCP Server | @line-harness/mcp-server (Claude Code / AI エージェント連携) |
+| MCP Server | @airestart/line-harness-mcp-server (Claude Code / AI エージェント連携) |
 
 ## デプロイ先
 

@@ -98,7 +98,7 @@ CLI 가 다음을 모두 처리합니다:
 - **트래픽 풀** — 여러 계정에 자동 분산
 
 ### AI 통합
-- **MCP Server 내장** (`@line-harness/mcp-server`) — Claude Code 에서 자연어로 모든 조작
+- **MCP Server 내장** (`@airestart/line-harness-mcp-server` / `line-harness-custom-mcp`) — Claude Code 에서 자연어로 모든 조작
   - `list_conversations` / `get_conversation` — AI 가 미응답 대화 모니터링
   - `create_scenario` / `update_step` — AI 가 시나리오 설계
   - `broadcast` / `send_message` — 발송 류는 사용자 확인 필수
@@ -124,7 +124,7 @@ CLI 가 다음을 모두 처리합니다:
 - **Web** (`apps/web`): Next.js 15 대시보드 (19 섹션)
 - **Packages**:
   - `@line-harness/sdk` — TypeScript SDK
-  - `@line-harness/mcp-server` — Claude Code 용 MCP 서버
+  - `@airestart/line-harness-mcp-server` / `line-harness-custom-mcp` — Claude Code 용 MCP 서버
   - `@airestart/create-line-harness` / `create-line-harness-custom` — 셋업 CLI
   - `@line-harness/plugin-template` — 플러그인 확장 템플릿
   - `@line-harness/db` — D1 migration + 헬퍼
@@ -138,7 +138,7 @@ CLI 가 다음을 모두 처리합니다:
 - [셋업 가이드 영상](https://youtu.be/DiRuGaeq1sM)
 - [LINE 에서 데모 체험](https://shudesu.github.io/line-harness-oss/)
 - [npm: @line-harness/sdk](https://www.npmjs.com/package/@line-harness/sdk)
-- [npm: @line-harness/mcp-server](https://www.npmjs.com/package/@line-harness/mcp-server)
+- [npm: @airestart/line-harness-mcp-server](https://www.npmjs.com/package/@airestart/line-harness-mcp-server)
 - [npm: @airestart/create-line-harness](https://www.npmjs.com/package/@airestart/create-line-harness)
 
 ---

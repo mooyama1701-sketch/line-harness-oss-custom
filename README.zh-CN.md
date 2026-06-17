@@ -98,7 +98,7 @@ CLI 自动完成以下全部步骤：
 - **流量池** — 跨多账号自动分发
 
 ### AI 集成
-- **内置 MCP Server** (`@line-harness/mcp-server`) — Claude Code 自然语言完整操作
+- **内置 MCP Server** (`@airestart/line-harness-mcp-server` / `line-harness-custom-mcp`) — Claude Code 自然语言完整操作
   - `list_conversations` / `get_conversation` — AI 监控未答会话
   - `create_scenario` / `update_step` — 让 AI 设计场景
   - `broadcast` / `send_message` — 发送类操作需要用户确认
@@ -124,7 +124,7 @@ CLI 自动完成以下全部步骤：
 - **Web** (`apps/web`): Next.js 15 后台（19 个功能模块）
 - **Packages**:
   - `@line-harness/sdk` — TypeScript SDK
-  - `@line-harness/mcp-server` — Claude Code 用 MCP server
+  - `@airestart/line-harness-mcp-server` / `line-harness-custom-mcp` — Claude Code 用 MCP server
   - `@airestart/create-line-harness` / `create-line-harness-custom` — 配置 CLI
   - `@line-harness/plugin-template` — 插件扩展模板
   - `@line-harness/db` — D1 migration 与辅助函数
@@ -138,7 +138,7 @@ CLI 自动完成以下全部步骤：
 - [配置教程视频](https://youtu.be/DiRuGaeq1sM)
 - [在 LINE 上免费体验](https://shudesu.github.io/line-harness-oss/)
 - [npm: @line-harness/sdk](https://www.npmjs.com/package/@line-harness/sdk)
-- [npm: @line-harness/mcp-server](https://www.npmjs.com/package/@line-harness/mcp-server)
+- [npm: @airestart/line-harness-mcp-server](https://www.npmjs.com/package/@airestart/line-harness-mcp-server)
 - [npm: @airestart/create-line-harness](https://www.npmjs.com/package/@airestart/create-line-harness)
 
 ---

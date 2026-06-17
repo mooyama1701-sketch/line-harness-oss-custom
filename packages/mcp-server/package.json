@@ -1,9 +1,9 @@
 {
-  "name": "@line-harness/mcp-server",
+  "name": "@airestart/line-harness-mcp-server",
   "version": "0.15.0",
   "type": "module",
   "bin": {
-    "line-harness-mcp": "./dist/index.js"
+    "line-harness-custom-mcp": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "scripts": {

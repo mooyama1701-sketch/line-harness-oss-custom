@@ -98,7 +98,7 @@ CLI が以下を全部やる:
 - **トラフィックプール** — 複数アカウントへ自動振り分け
 
 ### AI 統合
-- **MCP Server 同梱** (`@line-harness/mcp-server`) — Claude Code から自然言語で全操作
+- **MCP Server 同梱** (`@airestart/line-harness-mcp-server` / `line-harness-custom-mcp`) — Claude Code から自然言語で全操作
   - `list_conversations` / `get_conversation` — 未返信会話の AI 監視
   - `create_scenario` / `update_step` — シナリオを AI に作らせる
   - `broadcast` / `send_message` — メッセージ送信（要ユーザー確認）
@@ -124,7 +124,7 @@ CLI が以下を全部やる:
 - **Web** (`apps/web`): Next.js 15 ダッシュボード（19 セクション）
 - **Packages**:
   - `@line-harness/sdk` — TypeScript SDK
-  - `@line-harness/mcp-server` — Claude Code 用 MCP server
+  - `@airestart/line-harness-mcp-server` / `line-harness-custom-mcp` — Claude Code 用 MCP server
   - `@airestart/create-line-harness` / `create-line-harness-custom` — セットアップ CLI
   - `@line-harness/plugin-template` — プラグイン拡張用テンプレート
   - `@line-harness/db` — D1 マイグレーション + ヘルパー
@@ -138,7 +138,7 @@ CLI が以下を全部やる:
 - [セットアップガイド (動画)](https://youtu.be/DiRuGaeq1sM)
 - [LINE で無料体験する](https://shudesu.github.io/line-harness-oss/)
 - [npm: @line-harness/sdk](https://www.npmjs.com/package/@line-harness/sdk)
-- [npm: @line-harness/mcp-server](https://www.npmjs.com/package/@line-harness/mcp-server)
+- [npm: @airestart/line-harness-mcp-server](https://www.npmjs.com/package/@airestart/line-harness-mcp-server)
 - [npm: @airestart/create-line-harness](https://www.npmjs.com/package/@airestart/create-line-harness)
 
 ---

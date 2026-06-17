@@ -230,7 +230,7 @@ bash scripts/sync-versions.sh
 
 # 4. ビルド + テスト
 pnpm --filter @line-harness/sdk build && pnpm --filter @line-harness/sdk test
-pnpm --filter @line-harness/mcp-server build
+pnpm --filter @airestart/line-harness-mcp-server build
 
 # 5. npm publish (pnpm で)
 cd packages/sdk && pnpm publish --access public --no-git-checks

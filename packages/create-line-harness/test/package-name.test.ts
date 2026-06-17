@@ -72,4 +72,30 @@ describe("custom setup package metadata", () => {
       );
     }
   });
+
+  it("uses the custom MCP npm package, CLI bin, and server name", () => {
+    const mcpPackageJson = JSON.parse(
+      readFileSync(join(process.cwd(), "packages/mcp-server/package.json"), "utf-8"),
+    ) as {
+      name: string;
+      bin: Record<string, string>;
+    };
+    const mcpEntrySource = readFileSync(
+      join(process.cwd(), "packages/mcp-server/src/index.ts"),
+      "utf-8",
+    );
+    const mcpConfigSource = readFileSync(
+      join(packageDir, "src/steps/mcp-config.ts"),
+      "utf-8",
+    );
+
+    expect(mcpPackageJson.name).toBe("@airestart/line-harness-mcp-server");
+    expect(mcpPackageJson.bin).toEqual({
+      "line-harness-custom-mcp": "./dist/index.js",
+    });
+    expect(mcpEntrySource).toContain('name: "line-harness-custom"');
+    expect(mcpEntrySource).toContain("LINE Harness Custom MCP Server running on stdio");
+    expect(mcpConfigSource).toContain("@airestart/line-harness-mcp-server@latest");
+    expect(mcpConfigSource).not.toContain("@line-harness/mcp-server@latest");
+  });
 });

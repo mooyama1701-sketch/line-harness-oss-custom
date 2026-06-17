@@ -11,7 +11,7 @@
 - Cloudflareの既存Worker、D1、R2、Pagesは再利用・上書きしない。
 - 同名リソースが存在する場合は停止する。
 - 公式版と改造版のローカル設定は分離する。
-- setup package名、CLI bin名、MCP package名は改造版専用名へ分離する。
+- setup package名、CLI bin名、MCP package名、MCP bin名、MCP内部server名は改造版専用名へ分離する。
 - 本番deployは実装・検証とは別タスクで行う。
 - 実績、数値、URL、認証情報は推測や捏造をしない。
 
@@ -45,4 +45,4 @@
 - ローカルclone先は `~/.line-harness-custom`、setup stateは `.line-harness-custom-setup.json`、install configは `.line-harness-custom-config.json` へ分離済み。
 - MCP登録名は `line-harness-custom` へ分離済み。公式版の `line-harness` 登録は読込・変更・削除しない。
 - setup package名は `@airestart/create-line-harness`、CLI bin名は `create-line-harness-custom` へ分離済み。
-- MCP package名、MCP bin名、MCP内部server名は未確定。
+- MCP package名は `@airestart/line-harness-mcp-server`、MCP bin名は `line-harness-custom-mcp`、MCP内部server名は `line-harness-custom` へ分離済み。

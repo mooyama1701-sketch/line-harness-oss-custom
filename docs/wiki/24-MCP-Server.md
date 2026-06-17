@@ -12,9 +12,9 @@ LINE Harness MCP Server は [Model Context Protocol](https://modelcontextprotoco
 // .mcp.json
 {
   "mcpServers": {
-    "line-harness": {
+    "line-harness-custom": {
       "command": "npx",
-      "args": ["-y", "@line-harness/mcp-server@latest"],
+      "args": ["-y", "@airestart/line-harness-mcp-server@latest"],
       "env": {
         "LINE_HARNESS_API_URL": "https://your-worker.workers.dev",
         "LINE_HARNESS_API_KEY": "your-api-key"
@@ -137,7 +137,7 @@ v0.4.0 より、`send_message` と `broadcast` で送信するメッセージ中
 ```
 Claude Code / MCP Client
     ↓ (stdio)
-MCP Server (@line-harness/mcp-server)
+MCP Server (@airestart/line-harness-mcp-server)
     ↓ (HTTP)
 @line-harness/sdk
     ↓ (HTTP + API Key)

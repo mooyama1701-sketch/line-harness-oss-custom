@@ -121,7 +121,7 @@ describe("custom local name isolation", () => {
     expect(mcpConfig.mcpServers.another.command).toBe("node");
     expect(mcpConfig.mcpServers[CUSTOM_MCP_SERVER_NAME]).toMatchObject({
       command: "npx",
-      args: ["-y", "@line-harness/mcp-server@latest"],
+      args: ["-y", "@airestart/line-harness-mcp-server@latest"],
       env: {
         LINE_HARNESS_API_URL: "https://custom.example.test",
         LINE_HARNESS_API_KEY: "custom-key",
@@ -147,7 +147,7 @@ describe("custom local name isolation", () => {
             },
             [CUSTOM_MCP_SERVER_NAME]: {
               command: "npx",
-              args: ["-y", "@line-harness/mcp-server@latest"],
+              args: ["-y", "@airestart/line-harness-mcp-server@latest"],
               env: {
                 LINE_HARNESS_API_URL: "https://old-custom.example.test",
                 LINE_HARNESS_API_KEY: "old-custom-key",

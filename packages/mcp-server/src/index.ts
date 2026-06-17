@@ -4,7 +4,7 @@ import { registerAllTools } from "./tools/index.js";
 import { registerAllResources } from "./resources/index.js";
 
 const server = new McpServer({
-  name: "line-harness",
+  name: "line-harness-custom",
   version: "0.3.0",
 });
 
@@ -14,7 +14,7 @@ registerAllResources(server);
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("LINE Harness MCP Server running on stdio");
+  console.error("LINE Harness Custom MCP Server running on stdio");
 }
 
 main().catch((error) => {
