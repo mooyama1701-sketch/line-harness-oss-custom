@@ -2,9 +2,9 @@
 
 ## 基本情報
 
-- 最終更新日：2026-06-15
+- 最終更新日：2026-06-17
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。実試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -16,6 +16,7 @@
 - `AGENTS.md`：共通作業ルール
 - `docs/CUSTOM_RELEASE_POLICY.md`：初期リリース設計方針
 - `docs/PROJECT_STATUS.md`：現在の進捗
+- `docs/INSTALLATION_TEST_PLAN.md`：新規環境インストール試験計画
 - `docs/UPSTREAM_ANALYSIS.md`：上流との差分と検証履歴
 
 ## 完了した作業
@@ -53,6 +54,7 @@
 - [x] 改造版初期リリース向けP0対応として、自動update無効化を検証し、正式取り込み可能と判断
 - [x] 初期リリース向けにroot `LICENSE` / `NOTICE` と公開対象npm packageへの `LICENSE` / `NOTICE` 同梱を整備
 - [x] MIT License著作権表示 `Copyright (c) 2026 Shudesu and LINE Harness contributors` が元作者確認済み
+- [x] 新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化
 
 初期リリース準備状況：
 
@@ -75,19 +77,23 @@
 - 公開対象npm packageへの `LICENSE` / `NOTICE` 同梱
 - READMEへの元OSSクレジットと改造版説明の追記
 - MIT License著作権表示の元作者確認
+- 新規環境インストール試験計画の文書化
 
 未完了：
 
 - 新規環境でのインストール試験
+- sandbox最小試験
+- 実Cloudflare環境での同名リソース停止確認
+- 実LINE環境でのWebhook/LIFF確認
 
 ## 現在進行中の作業
 
-- [ ] 改造版初期差分の設計
+- [ ] 新規環境インストール試験の実施準備
 
 ## 次に行う作業
 
 1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
-2. 新規環境でのインストール試験計画を具体化する
+2. `docs/INSTALLATION_TEST_PLAN.md` に従い、sandbox最小試験から新規環境インストール試験を開始する
 
 ## 現在のローカル環境
 
@@ -139,6 +145,7 @@
 - `docs/CUSTOM_RELEASE_POLICY.md`
 - `docs/DECISIONS.md`
 - `docs/INSTALLER_ARCHITECTURE.md`
+- `docs/INSTALLATION_TEST_PLAN.md`
 - `docs/RELEASE_CHECKLIST.md`
 - `docs/UPSTREAM_ANALYSIS.md`
 - `/Users/mooyama/codex/LINE-Harness-oss-Custom`
@@ -151,6 +158,7 @@
 - 既存本番カスタマイズを引き継ぐか
 - 開発用Cloudflareリソース名
 - テスト用LINE公式アカウントの準備状況
+- 新規環境インストール試験の実施結果
 - 実Cloudflare環境で、Worker secretsとplain varsが同名で存在する場合の最終的な優先順位
 - 公式CLI `0.1.25`とnpm公開済み`0.1.24`のどちらをインストーラー調査基準にするか
 
@@ -163,6 +171,7 @@
 - `upstream` は公式リポジトリを向いているため、誤って公式へpushしないよう運用上の注意が必要
 - 仮名称が多く、公開前に正式名称を決める必要がある
 - setup処理でCloudflare同名リソース時の停止処理はmock検証済みだが、実Cloudflare環境でのread-only確認は未実施
+- 新規環境インストール試験計画は作成済みだが、sandbox最小試験、実Cloudflare試験、実LINE試験は未実施
 - 本番環境と検証環境の分離を徹底しないと、CloudflareやLINE設定へ影響する可能性がある
 - 改造版にはroot `LICENSE` と `NOTICE` を追加済み。MIT License著作権表示は元作者確認済み。
 - 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があったが、改造版setupでは同名Worker、Pages project、D1 database、R2 bucketを検出した場合に作成・更新・deploy・migration前に停止するよう変更済み
@@ -170,7 +179,7 @@
 
 ## 次回Codexへ依頼する作業
 
-次は、新規環境でのインストール試験計画を具体化してください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
+次は、`docs/INSTALLATION_TEST_PLAN.md` に従い、sandbox最小試験から開始してください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 
