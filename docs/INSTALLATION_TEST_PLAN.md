@@ -13,6 +13,7 @@
 - 対象CLI：`@airestart/create-line-harness`
 - 対象bin：`create-line-harness-custom`
 - 対象ソース：改造版repositoryの固定commit
+- 認証前停止モード：`LINE_HARNESS_SETUP_STOP_BEFORE_CLOUDFLARE_AUTH=1`
 - 実Cloudflare環境での同名リソース停止確認：未実施
 - 実LINE環境でのWebhook/LIFF確認：未実施
 
@@ -99,7 +100,7 @@ pnpm --filter @airestart/create-line-harness pack --dry-run
 |---:|---|---|---|---|---|---|
 | 1 | npm package起動確認 | 公開済み、または検証対象のnpm packageからCLIが起動することを確認する | npm registryへ接続できる | CLIが起動し、想定外の旧package名へ流れない | npm読み取り | npm cacheのみ |
 | 2 | sandbox内update無効化確認 | 外部更新処理に進まないことをpackage経由で確認する | sandboxを使用 | updateが未対応案内で終了し、manifest取得やCloudflare更新に進まない | npm読み取り | sandbox削除 |
-| 3 | sandbox内clone確認 | `setup` 起動時に改造版repositoryをcloneし、固定commitへcheckoutすることを確認する | npm/GitHubへ接続できる | originが改造版repository、HEADが固定commit、detached HEAD、worktree clean | npm/GitHub読み取り | sandbox削除 |
+| 3 | sandbox内clone確認 | `setup` 起動時に改造版repositoryをcloneし、固定commitへcheckoutすることを確認する | npm/GitHubへ接続できる。`LINE_HARNESS_SETUP_STOP_BEFORE_CLOUDFLARE_AUTH=1` を指定する | originが改造版repository、HEADが固定commit、detached HEAD。Cloudflare認証チェック前で正常停止する | npm/GitHub読み取り | sandbox削除 |
 | 4 | 依存関係導入確認 | clone後に固定commitの依存関係を導入できるか確認する | sandbox内clone完了 | `pnpm install --frozen-lockfile` またはfallback installが完了する | npm/GitHub読み取り | sandbox削除 |
 | 5 | Cloudflare認証確認 | 試験用CloudflareアカウントをCLIが認識できるか確認する | 試験用Cloudflareログイン | `npx wrangler whoami` で試験用accountが確認できる | Cloudflare読み取り | 必要ならlogout |
 | 6 | Cloudflare同名確認 | 本番や既存リソースと衝突しないことをread-onlyで確認する | 試験用Cloudflareログイン、候補名決定 | Worker/Pages/D1/R2の一覧で候補名の有無を確認できる | Cloudflare読み取り | 不要 |
@@ -108,7 +109,7 @@ pnpm --filter @airestart/create-line-harness pack --dry-run
 
 ```bash
 ./scripts/run-create-line-harness-sandbox.sh --name install-min --reset -- npx -y @airestart/create-line-harness update
-./scripts/run-create-line-harness-sandbox.sh --name install-min --reset -- npx -y @airestart/create-line-harness
+./scripts/run-create-line-harness-sandbox.sh --name install-min --reset -- env LINE_HARNESS_SETUP_STOP_BEFORE_CLOUDFLARE_AUTH=1 npx -y @airestart/create-line-harness
 git -C /private/tmp/line-harness-sandboxes/install-min/home/.line-harness-custom remote get-url origin
 git -C /private/tmp/line-harness-sandboxes/install-min/home/.line-harness-custom rev-parse --abbrev-ref HEAD
 git -C /private/tmp/line-harness-sandboxes/install-min/home/.line-harness-custom rev-parse HEAD
@@ -166,10 +167,10 @@ git rev-parse HEAD
 - 初期リリースでは自動更新不可、という案内で終了する
 - 公式manifest取得、Cloudflare更新、D1 migration、Worker/Pages更新へ進まない
 
-3. sandboxでsetupを起動し、Cloudflareログイン前で止めます。
+3. sandboxでsetupを起動し、Cloudflare認証チェック前で止めます。
 
 ```bash
-./scripts/run-create-line-harness-sandbox.sh --name install-min --reset -- npx -y @airestart/create-line-harness
+./scripts/run-create-line-harness-sandbox.sh --name install-min --reset -- env LINE_HARNESS_SETUP_STOP_BEFORE_CLOUDFLARE_AUTH=1 npx -y @airestart/create-line-harness
 ```
 
 成功条件：
@@ -177,7 +178,8 @@ git rev-parse HEAD
 - npm packageからCLIが起動する
 - `~/.line-harness-custom` 相当のsandbox内ディレクトリにcloneされる
 - 依存関係導入まで完了する
-- CloudflareやLINEの作成・変更には進まない
+- `検証用停止モードが有効です` と表示される
+- Cloudflare認証チェック、`wrangler login`、CloudflareやLINEの作成・変更には進まない
 
 4. sandbox内cloneを確認します。
 
@@ -200,7 +202,7 @@ git -C /private/tmp/line-harness-sandboxes/install-min/home/.line-harness-custom
 今回の文書化では修正せず、後続課題として扱います。
 
 - `CUSTOM_SOURCE_COMMIT` は暫定commitであり、初期リリース直前に最終リリースcommitへ更新する必要がある。
-- setup CLIにdry-runは見つかっていないため、実作成前の安全確認はunit test、sandbox、Cloudflare read-only確認で補う必要がある。
+- setup CLIにdry-runは見つかっていないため、実作成前の安全確認はunit test、認証前停止モード付きsandbox、Cloudflare read-only確認で補う必要がある。
 - `createDatabase()`、R2作成、Pages作成には既存リソースを続行扱いにする分岐が残っている。前段の衝突ガードで止める設計だが、実Cloudflareで順序確認が必要。
 - `README.md` のNode.js条件は `22+`、package enginesとCLI checkは `>=20` で不一致がある。
 - `README.md` はLIFFアプリの自動作成と説明しているが、現在のCLIはLIFF IDを入力する流れになっている。
@@ -213,7 +215,7 @@ git -C /private/tmp/line-harness-sandboxes/install-min/home/.line-harness-custom
 初期リリース前に、少なくとも以下を確認します。
 
 - 外部接続・書き込みなしの試験が成功している。
-- npm package起動と固定commit取得をsandboxで確認している。
+- npm package起動と固定commit取得を認証前停止モード付きsandboxで確認している。
 - Cloudflare read-onlyで本番名や既存名との衝突がないことを確認している。
 - 試験専用Cloudflare/LINE環境で新規フルセットアップが成功している。
 - 同名リソースがある場合に、作成・更新・deploy・migration前に停止することを実Cloudflare環境で確認している。

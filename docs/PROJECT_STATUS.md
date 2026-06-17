@@ -4,7 +4,7 @@
 
 - 最終更新日：2026-06-17
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。実試験は未実施。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。実Cloudflare/LINE試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -55,6 +55,7 @@
 - [x] 初期リリース向けにroot `LICENSE` / `NOTICE` と公開対象npm packageへの `LICENSE` / `NOTICE` 同梱を整備
 - [x] MIT License著作権表示 `Copyright (c) 2026 Shudesu and LINE Harness contributors` が元作者確認済み
 - [x] 新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化
+- [x] setupの認証前停止モードを実装し、sandbox最小試験でCloudflare認証前に止められるようにする
 
 初期リリース準備状況：
 
@@ -78,11 +79,12 @@
 - READMEへの元OSSクレジットと改造版説明の追記
 - MIT License著作権表示の元作者確認
 - 新規環境インストール試験計画の文書化
+- setup認証前停止モード
 
 未完了：
 
 - 新規環境でのインストール試験
-- sandbox最小試験
+- 認証前停止モードを使ったsandbox最小試験
 - 実Cloudflare環境での同名リソース停止確認
 - 実LINE環境でのWebhook/LIFF確認
 
@@ -93,7 +95,7 @@
 ## 次に行う作業
 
 1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
-2. `docs/INSTALLATION_TEST_PLAN.md` に従い、sandbox最小試験から新規環境インストール試験を開始する
+2. `docs/INSTALLATION_TEST_PLAN.md` に従い、認証前停止モード付きsandbox最小試験から新規環境インストール試験を開始する
 
 ## 現在のローカル環境
 
@@ -171,7 +173,7 @@
 - `upstream` は公式リポジトリを向いているため、誤って公式へpushしないよう運用上の注意が必要
 - 仮名称が多く、公開前に正式名称を決める必要がある
 - setup処理でCloudflare同名リソース時の停止処理はmock検証済みだが、実Cloudflare環境でのread-only確認は未実施
-- 新規環境インストール試験計画は作成済みだが、sandbox最小試験、実Cloudflare試験、実LINE試験は未実施
+- 新規環境インストール試験計画とsetup認証前停止モードは作成済みだが、認証前停止モード付きsandbox最小試験、実Cloudflare試験、実LINE試験は未実施
 - 本番環境と検証環境の分離を徹底しないと、CloudflareやLINE設定へ影響する可能性がある
 - 改造版にはroot `LICENSE` と `NOTICE` を追加済み。MIT License著作権表示は元作者確認済み。
 - 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があったが、改造版setupでは同名Worker、Pages project、D1 database、R2 bucketを検出した場合に作成・更新・deploy・migration前に停止するよう変更済み

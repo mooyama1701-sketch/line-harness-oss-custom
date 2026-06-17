@@ -30,7 +30,7 @@ import {
   type CloudflareAccount,
 } from "../lib/wrangler.js";
 
-interface SetupState {
+export interface SetupState {
   projectName?: string;
   lineChannelId?: string;
   lineChannelAccessToken?: string;
@@ -68,6 +68,38 @@ const ACCOUNT_DEPENDENT_STEPS = [
   "workerConfig",
   "adminAuth",
 ];
+
+export const SETUP_STOP_BEFORE_CLOUDFLARE_AUTH_ENV =
+  "LINE_HARNESS_SETUP_STOP_BEFORE_CLOUDFLARE_AUTH";
+
+export type SetupRunResult = "completed" | "stoppedBeforeCloudflareAuth";
+
+interface SetupInnerDeps {
+  checkDeps: () => Promise<void>;
+  ensureAuth: () => Promise<void>;
+}
+
+const defaultSetupInnerDeps: SetupInnerDeps = {
+  checkDeps,
+  ensureAuth,
+};
+
+export function shouldStopBeforeCloudflareAuth(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  const value = env[SETUP_STOP_BEFORE_CLOUDFLARE_AUTH_ENV];
+  return value === "1" || value?.toLowerCase() === "true";
+}
+
+function logStopBeforeCloudflareAuth(): void {
+  p.log.info(
+    [
+      "検証用停止モードが有効です。",
+      "改造版ソースの取得、固定commit checkout、依存関係導入、環境チェックの後、Cloudflare認証チェック前で停止しました。",
+      "Cloudflare認証、wrangler login、リソース確認・作成、LINE設定変更は実行していません。",
+    ].join("\n"),
+  );
+}
 
 function getStatePath(repoDir: string): string {
   return getCustomSetupStatePath(repoDir);
@@ -344,8 +376,10 @@ export async function runSetup(repoDir: string): Promise<void> {
   process.once("SIGTERM", onSignal);
 
   try {
-    await runSetupInner(state, repoDir);
-    cleanupSuccess();
+    const result = await runSetupInner(state, repoDir);
+    if (result === "completed") {
+      cleanupSuccess();
+    }
   } catch (error) {
     cleanupFailure();
     if (error instanceof CloudflareResourceCollisionError) {
@@ -372,15 +406,21 @@ export async function runSetup(repoDir: string): Promise<void> {
   }
 }
 
-async function runSetupInner(
+export async function runSetupInner(
   state: SetupState,
   repoDir: string,
-): Promise<void> {
+  deps: SetupInnerDeps = defaultSetupInnerDeps,
+): Promise<SetupRunResult> {
   // Step 1: Check dependencies
-  await checkDeps();
+  await deps.checkDeps();
+
+  if (shouldStopBeforeCloudflareAuth()) {
+    logStopBeforeCloudflareAuth();
+    return "stoppedBeforeCloudflareAuth";
+  }
 
   // Step 2: Authenticate with Cloudflare
-  await ensureAuth();
+  await deps.ensureAuth();
 
   // Step 2.4: If we have a saved accountId, make sure it still belongs to the current wrangler session
   await verifyAccount(state, repoDir);
@@ -844,4 +884,5 @@ ON CONFLICT(channel_id) DO UPDATE SET
   writeFileSync(configPath, JSON.stringify(fullConfig, null, 2) + "\n");
 
   p.outro(pc.green("LINE Harness を使い始めましょう 🎉"));
+  return "completed";
 }
