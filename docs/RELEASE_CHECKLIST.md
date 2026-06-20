@@ -33,15 +33,16 @@
 
 - [x] 新規環境インストール試験計画を作成した
 - [x] setupの認証前停止モードを実装した
-- [ ] sandbox最小試験を実施した
+- [x] sandbox最小試験を実施した
 - [ ] Lintが成功している
 - [ ] 型チェックが成功している
 - [ ] 単体テストが成功している
-- [ ] ビルドが成功している
-- [ ] CLIの基本動作を確認した
-- [ ] npm packageからのCLI起動を確認した
-- [ ] 改造版repositoryの固定commit取得を確認した
-- [ ] detached HEAD、origin、commit ID検証を確認した
+- [x] ビルドが成功している
+- [x] CLIの基本動作を確認した
+- [x] 公開前tarballからのCLI起動を確認した
+- [ ] npm registry経由の正式package取得を確認した
+- [x] 改造版repositoryの固定commit取得を確認した
+- [x] detached HEAD、origin、commit ID検証を確認した
 - [ ] エラー時の表示を確認した
 - [ ] 再実行時の動作を確認した
 
@@ -75,9 +76,9 @@
 - [ ] 秘密情報がGit管理されていない
 - [ ] 秘密情報がnpmパッケージに含まれていない
 - [ ] 第三者の秘密情報を外部サーバーへ送信しない
-- [ ] pnpm packの内容を確認した
-- [ ] pnpm pack産tarball内で `workspace:` 依存が通常versionへ変換されている
-- [ ] 公開対象ファイルを確認した
+- [x] pnpm packの内容を確認した
+- [x] pnpm pack産tarball内で `workspace:` 依存が通常versionへ変換されている
+- [x] 公開対象ファイルを確認した
 
 ## 7. ライセンスとドキュメント
 
@@ -95,9 +96,9 @@
 - [ ] npmアカウントと権限を確認した
 - [ ] npmパッケージ名が利用可能である
 - [x] MIT License著作権表示の元作者確認が完了している
-- [ ] package.jsonのversionを確認した
+- [x] package.jsonのversionを確認した
 - [ ] pnpm pack --dry-runを確認した
-- [ ] npm pack産tarballを公開・検証用に使っていない
+- [x] npm pack産tarballを公開・検証用に使っていない
 - [ ] alphaまたはbetaタグを使用した
 - [ ] 公開後にnpx実行を確認した
 

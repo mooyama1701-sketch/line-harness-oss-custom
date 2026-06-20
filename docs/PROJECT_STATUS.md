@@ -4,7 +4,7 @@
 
 - 最終更新日：2026-06-20
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。実Cloudflare/LINE試験は未実施。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。実Cloudflare/LINE試験とnpm registry経由の正式package取得試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -57,6 +57,7 @@
 - [x] 新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化
 - [x] setupの認証前停止モードを実装し、sandbox最小試験でCloudflare認証前に止められるようにする
 - [x] `packages/create-line-harness` のpack方法を比較し、`npm pack` では `workspace:` 依存が残り、正式手順の `pnpm pack` では通常versionへ変換されることを確認
+- [x] 公開前 `pnpm pack` 産tarballで認証前停止モード付きsandbox最小試験を実施し、clone、固定commit checkout、依存導入、環境チェック、Cloudflare認証前停止を確認
 
 初期リリース準備状況：
 
@@ -82,11 +83,12 @@
 - 新規環境インストール試験計画の文書化
 - setup認証前停止モード
 - setup packageの `pnpm pack` 手順確認とtarball依存表記の再発防止テスト
+- 公開前tarballによる認証前停止モード付きsandbox最小試験
 
 未完了：
 
 - 新規環境でのインストール試験
-- 認証前停止モードを使ったsandbox最小試験
+- npm registry経由の正式package取得試験
 - 実Cloudflare環境での同名リソース停止確認
 - 実LINE環境でのWebhook/LIFF確認
 
@@ -97,7 +99,7 @@
 ## 次に行う作業
 
 1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
-2. `docs/INSTALLATION_TEST_PLAN.md` に従い、認証前停止モード付きsandbox最小試験から新規環境インストール試験を開始する
+2. `docs/INSTALLATION_TEST_PLAN.md` に従い、Cloudflare read-only確認とnpm registry経由のpackage取得試験へ進む
 
 ## 現在のローカル環境
 
@@ -175,7 +177,7 @@
 - `upstream` は公式リポジトリを向いているため、誤って公式へpushしないよう運用上の注意が必要
 - 仮名称が多く、公開前に正式名称を決める必要がある
 - setup処理でCloudflare同名リソース時の停止処理はmock検証済みだが、実Cloudflare環境でのread-only確認は未実施
-- 新規環境インストール試験計画とsetup認証前停止モードは作成済みだが、認証前停止モード付きsandbox最小試験、実Cloudflare試験、実LINE試験は未実施
+- 新規環境インストール試験計画、setup認証前停止モード、公開前tarballによる認証前停止モード付きsandbox最小試験は完了済みだが、実Cloudflare試験と実LINE試験は未実施
 - 本番環境と検証環境の分離を徹底しないと、CloudflareやLINE設定へ影響する可能性がある
 - 改造版にはroot `LICENSE` と `NOTICE` を追加済み。MIT License著作権表示は元作者確認済み。
 - 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があったが、改造版setupでは同名Worker、Pages project、D1 database、R2 bucketを検出した場合に作成・更新・deploy・migration前に停止するよう変更済み
@@ -183,7 +185,34 @@
 
 ## 次回Codexへ依頼する作業
 
-次は、`docs/INSTALLATION_TEST_PLAN.md` に従い、sandbox最小試験から開始してください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
+次は、`docs/INSTALLATION_TEST_PLAN.md` に従い、Cloudflare read-only確認またはnpm registry経由の正式package取得試験へ進んでください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
+
+## 認証前停止モード付きsandbox最小試験結果（2026-06-20）
+
+検証対象：
+
+- package：`@airestart/create-line-harness`
+- package version：`0.1.25`
+- tarball作成方法：`pnpm pack`
+- tarball起動形式：`npx -p <tarball> create-line-harness-custom`
+
+確認済み：
+
+- `pnpm pack` 産tarball内で `@line-harness/update-engine` は `^0.0.2` として収録され、`workspace:` 依存は残らない
+- tarballに `dist/index.js`、`LICENSE`、`NOTICE`、`package.json` が含まれる
+- sandbox内でtarballからsetupを起動し、改造版repositoryのclone、固定commit checkout、依存導入、環境チェックに成功
+- clone先originは `https://github.com/mooyama1701-sketch/line-harness-oss-custom.git`
+- clone先はdetached HEADで、HEADは固定commit `593781111c06837408eb33b3d0f25c72c747f6f0`
+- `LINE_HARNESS_SETUP_STOP_BEFORE_CLOUDFLARE_AUTH=1` によりCloudflare認証前で終了コード `0` で停止
+- Cloudflare認証、`wrangler login`、Cloudflareリソース確認・作成、LINE設定変更は実行していない
+- 停止位置がCloudflare認証前のため、`.line-harness-custom-setup.json` と `.line-harness-custom-config.json` は作成されていない
+
+未実施：
+
+- npm registry経由の正式package取得試験
+- Cloudflare read-only確認
+- Cloudflareリソース作成を伴う新規環境インストール試験
+- LINE Developers設定やWebhook/LIFF確認
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 

@@ -99,6 +99,13 @@ pnpm pack --pack-destination /private/tmp/line-harness-pack
 - `npm pack` は `workspace:` 依存を通常versionへ変換しないため、検証用tarball作成には使用しない。
 - pnpm 9.15.4では `pnpm --filter @airestart/create-line-harness pack ...` が `Unknown option: 'recursive'` で失敗するため、packageディレクトリへ移動して `pnpm pack` を実行する。
 - tarball展開後の `package.json` で `@line-harness/update-engine` が `workspace:^0.0.2` ではなく `^0.0.2` になっていることを確認する。
+- ローカルtarballからCLIを起動する場合は、`npx -p <tarball> create-line-harness-custom` を使用する。`npx <tarball>` はtarballを実行ファイルとして扱うため使用しない。
+
+実施結果（2026-06-20）：
+
+- `@airestart/create-line-harness@0.1.25` の `pnpm pack` 産tarballで確認した。
+- tarball内の `@line-harness/update-engine` は `^0.0.2` で、`workspace:` 依存は残っていなかった。
+- tarballには `dist/index.js`、`LICENSE`、`NOTICE`、`package.json` が含まれていた。
 
 ## 6. 区分2：認証・読み取りのみ
 
@@ -128,6 +135,23 @@ npx wrangler pages project list --json
 npx wrangler d1 list --json
 npx wrangler r2 bucket list
 ```
+
+公開前tarballでのsandbox最小試験コマンド：
+
+```bash
+./scripts/run-create-line-harness-sandbox.sh --name install-min-tarball --reset -- \
+  env LINE_HARNESS_SETUP_STOP_BEFORE_CLOUDFLARE_AUTH=1 \
+  npx -y -p /private/tmp/line-harness-pack/airestart-create-line-harness-0.1.25.tgz \
+  create-line-harness-custom
+```
+
+実施結果（2026-06-20）：
+
+- `pnpm pack` 産tarballからsetupを起動し、clone、固定commit checkout、依存導入、環境チェックに成功した。
+- 固定commit `593781111c06837408eb33b3d0f25c72c747f6f0` のdetached HEADになっていることを確認した。
+- Cloudflare認証前で終了コード `0` で停止した。
+- Cloudflare認証、`wrangler login`、Cloudflareリソース確認・作成、LINE設定変更は実行していない。
+- npm registry経由の正式package取得試験は未実施。
 
 ## 7. 区分3：Cloudflare/LINEへの作成・変更あり
 
