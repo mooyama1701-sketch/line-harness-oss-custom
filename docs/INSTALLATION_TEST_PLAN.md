@@ -9,7 +9,7 @@
 ## 2. 現在の状態
 
 - 計画作成日：2026-06-17
-- 状態：計画作成済み、実試験未実施
+- 状態：計画作成済み。公開前tarballによるsandbox最小試験とCloudflare read-only確認は実施済み。Cloudflare実作成試験、LINE試験、npm registry経由の正式package取得試験は未実施
 - 対象CLI：`@airestart/create-line-harness`
 - 対象bin：`create-line-harness-custom`
 - 対象ソース：改造版repositoryの固定commit
@@ -152,6 +152,20 @@ npx wrangler r2 bucket list
 - Cloudflare認証前で終了コード `0` で停止した。
 - Cloudflare認証、`wrangler login`、Cloudflareリソース確認・作成、LINE設定変更は実行していない。
 - npm registry経由の正式package取得試験は未実施。
+
+Cloudflare read-only確認結果（2026-06-20）：
+
+- Wrangler `4.77.0` で確認した。
+- OAuthでログイン済み。対象アカウントは `Mooyama1701@gmail.com's Account`。
+- `account:read`、`user:read`、`workers:write`、`workers_scripts:write`、`workers_tail:read`、`d1:write`、`pages:write` などの権限を確認した。write系権限も含まれるが、実行した操作は一覧・存在確認のみ。
+- 試験用Worker候補 `line-harness-custom-dev` は未使用。
+- 試験用Pages候補 `line-harness-custom-dev-admin` と prefix `line-harness-custom-dev-admin-` は未使用。
+- 試験用D1候補 `line-harness-custom-dev` は未使用。
+- 試験用R2候補 `line-harness-custom-dev-images` は未使用。
+- 本番Worker `line-harness-production` と本番D1 `line-harness` は同一Cloudflareアカウント上に存在する。
+- 本番Pages `line-harness-production-admin` は今回のPages一覧では確認できなかった。理由は未確認。
+- Cloudflareリソースの作成、変更、削除、deploy、migration、secret登録は実施していない。
+- 実作成試験へ進む前に、使用Cloudflareアカウントと試験用リソース名を確定し、本番Worker `line-harness-production` と本番D1 `line-harness` を使わないことを再確認する。
 
 ## 7. 区分3：Cloudflare/LINEへの作成・変更あり
 

@@ -4,7 +4,7 @@
 
 - 最終更新日：2026-06-20
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。実Cloudflare/LINE試験とnpm registry経由の正式package取得試験は未実施。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。Cloudflare read-only確認では試験用候補名が未使用であることを確認済み。Cloudflare実作成試験、LINE試験、npm registry経由の正式package取得試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -58,6 +58,7 @@
 - [x] setupの認証前停止モードを実装し、sandbox最小試験でCloudflare認証前に止められるようにする
 - [x] `packages/create-line-harness` のpack方法を比較し、`npm pack` では `workspace:` 依存が残り、正式手順の `pnpm pack` では通常versionへ変換されることを確認
 - [x] 公開前 `pnpm pack` 産tarballで認証前停止モード付きsandbox最小試験を実施し、clone、固定commit checkout、依存導入、環境チェック、Cloudflare認証前停止を確認
+- [x] Cloudflare read-only確認で試験用Worker/Pages/D1/R2候補名が未使用であることを確認
 
 初期リリース準備状況：
 
@@ -84,12 +85,13 @@
 - setup認証前停止モード
 - setup packageの `pnpm pack` 手順確認とtarball依存表記の再発防止テスト
 - 公開前tarballによる認証前停止モード付きsandbox最小試験
+- Cloudflare read-onlyによる試験用候補名の衝突確認
 
 未完了：
 
 - 新規環境でのインストール試験
 - npm registry経由の正式package取得試験
-- 実Cloudflare環境での同名リソース停止確認
+- Cloudflareリソース作成を伴う実作成試験
 - 実LINE環境でのWebhook/LIFF確認
 
 ## 現在進行中の作業
@@ -99,7 +101,7 @@
 ## 次に行う作業
 
 1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
-2. `docs/INSTALLATION_TEST_PLAN.md` に従い、Cloudflare read-only確認とnpm registry経由のpackage取得試験へ進む
+2. `docs/INSTALLATION_TEST_PLAN.md` に従い、使用Cloudflareアカウントと試験用リソース名を確定し、npm registry経由のpackage取得試験またはCloudflare実作成試験へ進む
 
 ## 現在のローカル環境
 
@@ -176,8 +178,8 @@
 
 - `upstream` は公式リポジトリを向いているため、誤って公式へpushしないよう運用上の注意が必要
 - 仮名称が多く、公開前に正式名称を決める必要がある
-- setup処理でCloudflare同名リソース時の停止処理はmock検証済みだが、実Cloudflare環境でのread-only確認は未実施
-- 新規環境インストール試験計画、setup認証前停止モード、公開前tarballによる認証前停止モード付きsandbox最小試験は完了済みだが、実Cloudflare試験と実LINE試験は未実施
+- setup処理でCloudflare同名リソース時の停止処理はmock検証済み。read-onlyでは試験用候補名が未使用であることを確認済みだが、実Cloudflare環境での作成前停止は未確認
+- 新規環境インストール試験計画、setup認証前停止モード、公開前tarballによる認証前停止モード付きsandbox最小試験、Cloudflare read-only確認は完了済みだが、Cloudflare実作成試験と実LINE試験は未実施
 - 本番環境と検証環境の分離を徹底しないと、CloudflareやLINE設定へ影響する可能性がある
 - 改造版にはroot `LICENSE` と `NOTICE` を追加済み。MIT License著作権表示は元作者確認済み。
 - 公式インストーラーは同名D1/R2/Pagesを既存扱いで続行する箇所があったが、改造版setupでは同名Worker、Pages project、D1 database、R2 bucketを検出した場合に作成・更新・deploy・migration前に停止するよう変更済み
@@ -185,7 +187,7 @@
 
 ## 次回Codexへ依頼する作業
 
-次は、`docs/INSTALLATION_TEST_PLAN.md` に従い、Cloudflare read-only確認またはnpm registry経由の正式package取得試験へ進んでください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
+次は、`docs/INSTALLATION_TEST_PLAN.md` に従い、使用Cloudflareアカウントと試験用リソース名を確定してから、npm registry経由の正式package取得試験またはCloudflare実作成試験へ進んでください。初期リリース直前にはsetup用clone元の固定commitを最終commitへ更新してください。
 
 ## 認証前停止モード付きsandbox最小試験結果（2026-06-20）
 
@@ -210,9 +212,55 @@
 未実施：
 
 - npm registry経由の正式package取得試験
-- Cloudflare read-only確認
 - Cloudflareリソース作成を伴う新規環境インストール試験
 - LINE Developers設定やWebhook/LIFF確認
+
+## Cloudflare read-only確認結果（2026-06-20）
+
+確認環境：
+
+- Wrangler：`4.77.0`
+- 認証状態：OAuthでログイン済み
+- 対象アカウント：`Mooyama1701@gmail.com's Account`
+- 確認済み権限：`account:read`、`user:read`、`workers:write`、`workers_scripts:write`、`workers_tail:read`、`d1:write`、`pages:write` など
+
+実行した操作：
+
+- `wrangler whoami`
+- `wrangler versions list --name ... --json`
+- `wrangler pages project list --json`
+- `wrangler d1 list --json`
+- `wrangler r2 bucket list --json`
+
+確認結果：
+
+| 種類 | 試験用候補名 | 結果 |
+|---|---|---|
+| Worker | `line-harness-custom-dev` | 未使用 |
+| Pages | `line-harness-custom-dev-admin` | 未使用 |
+| Pages prefix | `line-harness-custom-dev-admin-` | 該当なし |
+| D1 | `line-harness-custom-dev` | 未使用 |
+| R2 | `line-harness-custom-dev-images` | 未使用 |
+
+本番リソース確認：
+
+- 本番Worker `line-harness-production` は同一Cloudflareアカウント上に存在する
+- 本番D1 `line-harness` は同一Cloudflareアカウント上に存在する
+- 本番Pages `line-harness-production-admin` は今回のPages一覧では確認できなかった。理由は未確認であり、推測で断定しない
+
+注意：
+
+- 今回の操作は一覧・存在確認のみ。Cloudflareリソースの作成、変更、削除、deploy、migration、secret登録は実施していない
+- 認証tokenにはwrite系権限も含まれるため、実作成試験へ進む前に使用アカウントと試験用リソース名を確定し、本番名を使わないことを再確認する
+
+未実施：
+
+- Cloudflareリソース作成を伴う新規環境インストール試験
+- Worker Secrets登録
+- D1 migration
+- Pages deploy
+- LINE Developers設定やWebhook/LIFF確認
+- npm registry経由の正式package取得試験
 
 ## 優先未リリース2コミット検証結果（2026-06-14）
 

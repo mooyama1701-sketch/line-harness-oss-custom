@@ -48,7 +48,7 @@
 
 ## 4. Cloudflare検証
 
-- [ ] Cloudflare read-onlyで試験用リソース名の衝突有無を確認した
+- [x] Cloudflare read-onlyで試験用リソース名の衝突有無を確認した
 - [ ] 新規Workerを作成できる
 - [ ] 新規D1を作成できる
 - [ ] 新規R2を作成できる
