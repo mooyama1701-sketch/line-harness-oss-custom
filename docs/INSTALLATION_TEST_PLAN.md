@@ -73,7 +73,7 @@
 | 5 | ローカル名分離テスト | 公式版の設定名やMCP登録を読込・上書きしないことを確認する | 依存関係が導入済み | `custom-name-isolation.test.ts` が成功する | なし | 不要 |
 | 6 | インストーラーbuild | npm packageとして起動できる成果物を生成できるか確認する | 依存関係が導入済み | `pnpm --filter @airestart/create-line-harness build` が成功する | なし | 生成物の差分確認 |
 | 7 | 本体品質確認 | Worker/Admin/LIFF/DBなどの基本品質を確認する | 依存関係が導入済み | 変更範囲に応じたtypecheck/test/buildが成功する | なし | 生成物の差分確認 |
-| 8 | npm pack dry-run | npm公開対象ファイルに秘密情報や不要物が含まれないことを確認する | build済み | `dist`、`LICENSE`、`NOTICE`など必要なファイルだけが対象になる | なし | 不要 |
+| 8 | pnpm pack dry-run | npm公開対象ファイルに秘密情報や不要物が含まれず、workspace依存が通常versionへ変換されることを確認する | build済み | `dist`、`LICENSE`、`NOTICE`など必要なファイルだけが対象になり、`@line-harness/update-engine` が `^0.0.2` として収録される | なし | 不要 |
 
 候補コマンド：
 
@@ -89,8 +89,16 @@ pnpm --filter web test
 pnpm --filter liff build
 pnpm --filter @line-crm/db test
 pnpm --filter @line-crm/db typecheck
-pnpm --filter @airestart/create-line-harness pack --dry-run
+cd packages/create-line-harness
+pnpm pack --dry-run
+pnpm pack --pack-destination /private/tmp/line-harness-pack
 ```
+
+注意：
+
+- `npm pack` は `workspace:` 依存を通常versionへ変換しないため、検証用tarball作成には使用しない。
+- pnpm 9.15.4では `pnpm --filter @airestart/create-line-harness pack ...` が `Unknown option: 'recursive'` で失敗するため、packageディレクトリへ移動して `pnpm pack` を実行する。
+- tarball展開後の `package.json` で `@line-harness/update-engine` が `workspace:^0.0.2` ではなく `^0.0.2` になっていることを確認する。
 
 ## 6. 区分2：認証・読み取りのみ
 

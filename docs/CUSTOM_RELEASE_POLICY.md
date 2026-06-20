@@ -13,6 +13,7 @@
 - 公式版と改造版のローカル設定は分離する。
 - setup package名、CLI bin名、MCP package名、MCP bin名、MCP内部server名は改造版専用名へ分離する。
 - root `LICENSE` と `NOTICE` を同梱し、npm公開対象packageにもMIT License本文と元OSSクレジットを含める。
+- npm公開前のtarball確認は `npm pack` ではなく、packageディレクトリで `pnpm pack` を使う。`npm pack` は `workspace:` 依存を通常versionへ変換しないため、検証用tarball作成にも使用しない。
 - MIT Licenseの著作権表示は、元作者確認済みの `Copyright (c) 2026 Shudesu and LINE Harness contributors` を使用する。
 - 本番deployは実装・検証とは別タスクで行う。
 - 実績、数値、URL、認証情報は推測や捏造をしない。
@@ -50,4 +51,5 @@
 - setup package名は `@airestart/create-line-harness`、CLI bin名は `create-line-harness-custom` へ分離済み。
 - MCP package名は `@airestart/line-harness-mcp-server`、MCP bin名は `line-harness-custom-mcp`、MCP内部server名は `line-harness-custom` へ分離済み。
 - root `LICENSE` と `NOTICE` を追加済み。公開対象npm packageにも `LICENSE` と `NOTICE` を同梱する方針。
+- `packages/create-line-harness` の正式pack方法は、packageディレクトリでの `pnpm pack`。この方法では `@line-harness/update-engine` の `workspace:^0.0.2` がtarball内で `^0.0.2` へ変換される。
 - MIT Licenseの著作権表示は、元作者確認済みの `Copyright (c) 2026 Shudesu and LINE Harness contributors` を使用中。

@@ -2,9 +2,9 @@
 
 ## 基本情報
 
-- 最終更新日：2026-06-17
+- 最終更新日：2026-06-20
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。実Cloudflare/LINE試験は未実施。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。実Cloudflare/LINE試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -56,6 +56,7 @@
 - [x] MIT License著作権表示 `Copyright (c) 2026 Shudesu and LINE Harness contributors` が元作者確認済み
 - [x] 新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化
 - [x] setupの認証前停止モードを実装し、sandbox最小試験でCloudflare認証前に止められるようにする
+- [x] `packages/create-line-harness` のpack方法を比較し、`npm pack` では `workspace:` 依存が残り、正式手順の `pnpm pack` では通常versionへ変換されることを確認
 
 初期リリース準備状況：
 
@@ -80,6 +81,7 @@
 - MIT License著作権表示の元作者確認
 - 新規環境インストール試験計画の文書化
 - setup認証前停止モード
+- setup packageの `pnpm pack` 手順確認とtarball依存表記の再発防止テスト
 
 未完了：
 

@@ -75,7 +75,8 @@
 - [ ] 秘密情報がGit管理されていない
 - [ ] 秘密情報がnpmパッケージに含まれていない
 - [ ] 第三者の秘密情報を外部サーバーへ送信しない
-- [ ] npm packの内容を確認した
+- [ ] pnpm packの内容を確認した
+- [ ] pnpm pack産tarball内で `workspace:` 依存が通常versionへ変換されている
 - [ ] 公開対象ファイルを確認した
 
 ## 7. ライセンスとドキュメント
@@ -95,7 +96,8 @@
 - [ ] npmパッケージ名が利用可能である
 - [x] MIT License著作権表示の元作者確認が完了している
 - [ ] package.jsonのversionを確認した
-- [ ] npm pack --dry-runを確認した
+- [ ] pnpm pack --dry-runを確認した
+- [ ] npm pack産tarballを公開・検証用に使っていない
 - [ ] alphaまたはbetaタグを使用した
 - [ ] 公開後にnpx実行を確認した
 
