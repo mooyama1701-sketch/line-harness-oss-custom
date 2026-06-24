@@ -19,7 +19,12 @@ function normalizeName(name: string): string {
 }
 
 function asAssignableTag(tag: Tag, allTags: TagWithFriendCount[]): TagWithFriendCount {
-  return allTags.find((item) => item.id === tag.id) ?? { ...tag, friendCount: 0 }
+  return allTags.find((item) => item.id === tag.id) ?? {
+    ...tag,
+    folderId: null,
+    folderName: null,
+    friendCount: 0,
+  }
 }
 
 export default function FriendTagEditModal({ friend, allTags, onClose, onChanged }: Props) {

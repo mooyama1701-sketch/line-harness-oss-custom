@@ -83,6 +83,10 @@ export interface Tag {
   id: string;
   /** タグ名 */
   name: string;
+  /** 所属フォルダID。未分類の場合は null */
+  folderId?: string | null;
+  /** 所属フォルダ名。未分類の場合は null */
+  folderName?: string | null;
   /** 表示色 (HEX: #RRGGBB) */
   color: string;
   /** 作成日時 (ISO 8601) */

@@ -129,7 +129,13 @@ export type FriendListParams = {
 }
 
 export type FriendWithTags = Friend & { tags: Tag[] }
-export type TagWithFriendCount = Tag & { friendCount: number }
+export type TagWithFriendCount = Tag & { friendCount: number; folderId: string | null; folderName: string | null }
+export type TagFolderWithTagCount = {
+  id: string
+  name: string
+  createdAt: string
+  tagCount: number
+}
 /** Friend list items, optionally hydrated with chat status (when ?includeChatStatus=true) */
 export type FriendListItem = FriendWithTags & Partial<{
   latestIncomingMessage: { content: string; messageType: string; createdAt: string } | null
@@ -178,13 +184,29 @@ export const api = {
   tags: {
     list: () =>
       fetchApi<ApiResponse<TagWithFriendCount[]>>('/api/tags'),
-    create: (data: { name: string; color: string }) =>
+    create: (data: { name: string; color: string; folderId?: string | null }) =>
       fetchApi<ApiResponse<TagWithFriendCount>>('/api/tags', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+    update: (id: string, data: { folderId?: string | null }) =>
+      fetchApi<ApiResponse<TagWithFriendCount>>(`/api/tags/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
     delete: (id: string) =>
       fetchApi<ApiResponse<null>>(`/api/tags/${id}`, { method: 'DELETE' }),
+  },
+  tagFolders: {
+    list: () =>
+      fetchApi<ApiResponse<TagFolderWithTagCount[]>>('/api/tag-folders'),
+    create: (data: { name: string }) =>
+      fetchApi<ApiResponse<TagFolderWithTagCount>>('/api/tag-folders', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) =>
+      fetchApi<ApiResponse<null>>(`/api/tag-folders/${id}`, { method: 'DELETE' }),
   },
   scenarios: {
     list: (params?: { accountId?: string }) => {

@@ -54,6 +54,8 @@ export interface FriendListParams {
 export interface Tag {
   id: string
   name: string
+  folderId?: string | null
+  folderName?: string | null
   color: string
   createdAt: string
 }
@@ -61,6 +63,7 @@ export interface Tag {
 export interface CreateTagInput {
   name: string
   color?: string
+  folderId?: string | null
 }
 
 // ─── Scenario ───────────────────────────────────────────

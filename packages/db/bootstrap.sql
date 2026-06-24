@@ -737,9 +737,16 @@ CREATE TABLE stripe_events (
   processed_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now', '+9 hours'))
 );
 
+CREATE TABLE tag_folders (
+  id         TEXT PRIMARY KEY,
+  name       TEXT UNIQUE NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now', '+9 hours'))
+);
+
 CREATE TABLE tags (
   id         TEXT PRIMARY KEY,
   name       TEXT UNIQUE NOT NULL,
+  folder_id  TEXT REFERENCES tag_folders (id) ON DELETE SET NULL,
   color      TEXT NOT NULL DEFAULT '#3B82F6',
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now', '+9 hours'))
 );
@@ -951,6 +958,8 @@ CREATE INDEX idx_staff_members_role ON staff_members(role);
 CREATE INDEX idx_stripe_events_friend ON stripe_events (friend_id);
 
 CREATE INDEX idx_stripe_events_type ON stripe_events (event_type);
+
+CREATE INDEX idx_tags_folder_id ON tags (folder_id);
 
 CREATE INDEX idx_templates_category ON templates (category);
 
