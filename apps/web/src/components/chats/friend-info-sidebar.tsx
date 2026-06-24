@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import type { Tag } from '@line-crm/shared'
 import { api } from '@/lib/api'
 
 interface FriendDetail {
@@ -53,13 +54,17 @@ function renderValue(value: unknown): string {
 
 export default function FriendInfoSidebar({ friendId, chatStatus, operatorName }: Props) {
   const [friend, setFriend] = useState<FriendDetail | null>(null)
+  const [allTags, setAllTags] = useState<Tag[]>([])
+  const [selectedTagId, setSelectedTagId] = useState('')
+  const [tagActionLoading, setTagActionLoading] = useState(false)
+  const [tagError, setTagError] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const loadFriend = useCallback(() => {
     if (!friendId) {
       setFriend(null)
-      return
+      return () => {}
     }
     let cancelled = false
     setLoading(true)
@@ -76,6 +81,25 @@ export default function FriendInfoSidebar({ friendId, chatStatus, operatorName }
       setError(err instanceof Error ? err.message : String(err))
     }).finally(() => {
       if (!cancelled) setLoading(false)
+    })
+    return () => { cancelled = true }
+  }, [friendId])
+
+  useEffect(() => loadFriend(), [loadFriend])
+
+  useEffect(() => {
+    if (!friendId) {
+      setAllTags([])
+      setSelectedTagId('')
+      setTagError('')
+      return
+    }
+    let cancelled = false
+    api.tags.list().then((res) => {
+      if (cancelled) return
+      if (res.success) setAllTags(res.data)
+    }).catch(() => {
+      if (!cancelled) setTagError('タグ一覧を取得できませんでした')
     })
     return () => { cancelled = true }
   }, [friendId])
@@ -108,6 +132,39 @@ export default function FriendInfoSidebar({ friendId, chatStatus, operatorName }
     })
     return () => { cancelled = true }
   }, [friendId])
+
+  const availableTags = friend
+    ? allTags.filter((tag) => !friend.tags.some((friendTag) => friendTag.id === tag.id))
+    : []
+
+  const handleAddTag = async () => {
+    if (!friendId || !selectedTagId) return
+    setTagActionLoading(true)
+    setTagError('')
+    try {
+      await api.friends.addTag(friendId, selectedTagId)
+      setSelectedTagId('')
+      loadFriend()
+    } catch {
+      setTagError('タグの追加に失敗しました')
+    } finally {
+      setTagActionLoading(false)
+    }
+  }
+
+  const handleRemoveTag = async (tagId: string) => {
+    if (!friendId) return
+    setTagActionLoading(true)
+    setTagError('')
+    try {
+      await api.friends.removeTag(friendId, tagId)
+      loadFriend()
+    } catch {
+      setTagError('タグの解除に失敗しました')
+    } finally {
+      setTagActionLoading(false)
+    }
+  }
 
   if (!friendId) return null
 
@@ -192,17 +249,56 @@ export default function FriendInfoSidebar({ friendId, chatStatus, operatorName }
                   {friend.tags.map((tag) => (
                     <span
                       key={tag.id}
-                      className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium"
                       style={{
                         backgroundColor: `${tag.color}20`,
                         color: tag.color,
                       }}
                     >
                       {tag.name}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTag(tag.id)}
+                        disabled={tagActionLoading}
+                        className="ml-0.5 font-semibold disabled:opacity-40"
+                        aria-label={`タグ「${tag.name}」を解除`}
+                      >
+                        ×
+                      </button>
                     </span>
                   ))}
                 </div>
               )}
+              <div className="mt-3 space-y-2">
+                {allTags.length === 0 ? (
+                  <p className="text-[11px] text-gray-500">友だちリスト上部のタグ管理でタグを作成してください。</p>
+                ) : availableTags.length === 0 ? (
+                  <p className="text-[11px] text-gray-500">追加できるタグはありません。</p>
+                ) : (
+                  <div className="flex gap-2">
+                    <select
+                      className="min-w-0 flex-1 text-xs border border-gray-300 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={selectedTagId}
+                      onChange={(e) => setSelectedTagId(e.target.value)}
+                    >
+                      <option value="">タグを選択</option>
+                      {availableTags.map((tag) => (
+                        <option key={tag.id} value={tag.id}>{tag.name}</option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={handleAddTag}
+                      disabled={!selectedTagId || tagActionLoading}
+                      className="px-3 py-1.5 rounded-md text-xs font-medium text-white disabled:opacity-50"
+                      style={{ backgroundColor: '#06C755' }}
+                    >
+                      追加
+                    </button>
+                  </div>
+                )}
+                {tagError && <p className="text-[11px] text-red-600">{tagError}</p>}
+              </div>
             </div>
 
             {/* Rich Menu */}

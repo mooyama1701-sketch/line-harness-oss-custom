@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import type { FriendListItem } from '@/lib/api'
 import Header from '@/components/layout/header'
 import FriendListTable from '@/components/friends/friend-list-table'
+import TagManagementPanel from '@/components/friends/tag-management-panel'
 import CcPromptButton from '@/components/cc-prompt-button'
 import { useAccount } from '@/contexts/account-context'
 
@@ -127,6 +128,9 @@ export default function FriendsPage() {
   const handleSortChange = (v: SortMode) => updateAndResetPage(() => setSortMode(v))
   const handleResponseFilterChange = (v: ResponseFilter) => updateAndResetPage(() => setResponseFilter(v))
   const handleTagFilterChange = (v: string) => updateAndResetPage(() => setSelectedTagId(v))
+  const handleTagCreated = (tag: Tag) => {
+    setAllTags((current) => [...current, tag].sort((a, b) => a.name.localeCompare(b.name, 'ja')))
+  }
 
   return (
     <div>
@@ -134,6 +138,8 @@ export default function FriendsPage() {
         title="友だちリスト"
         description="友だちの検索や、詳細情報の確認ができます。"
       />
+
+      <TagManagementPanel tags={allTags} onCreated={handleTagCreated} />
 
       {/* Search + sort bar — L-step style */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">

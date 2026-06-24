@@ -2,9 +2,9 @@
 
 ## 基本情報
 
-- 最終更新日：2026-06-20
+- 最終更新日：2026-06-24
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。Cloudflare read-only確認では試験用候補名が未使用であることを確認済み。Cloudflare実作成試験、LINE試験、npm registry経由の正式package取得試験は未実施。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。Cloudflare read-only確認では試験用候補名が未使用であることを確認済み。管理画面の友だちリストにタグ一覧・新規作成を追加し、友だち一覧/詳細から既存タグを付与・解除できる最小タグ管理導線を実装済み。Cloudflare実作成試験、LINE試験、npm registry経由の正式package取得試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -59,6 +59,11 @@
 - [x] `packages/create-line-harness` のpack方法を比較し、`npm pack` では `workspace:` 依存が残り、正式手順の `pnpm pack` では通常versionへ変換されることを確認
 - [x] 公開前 `pnpm pack` 産tarballで認証前停止モード付きsandbox最小試験を実施し、clone、固定commit checkout、依存導入、環境チェック、Cloudflare認証前停止を確認
 - [x] Cloudflare read-only確認で試験用Worker/Pages/D1/R2候補名が未使用であることを確認
+- [x] 管理画面の友だちリスト上部にタグ一覧・新規作成を追加
+- [x] 友だち一覧のタグ編集で、既存タグの付与・解除とタグ未作成時の案内を表示
+- [x] チャット画面の友だち詳細で、既存タグの付与・解除を実行できるようにした
+- [x] タグ作成APIで空白名を拒否し、重複名を409として返す最小補強を追加
+- [x] タグ作成APIの空白名、trim、重複409の単体テストを追加
 
 初期リリース準備状況：
 
@@ -86,6 +91,8 @@
 - setup packageの `pnpm pack` 手順確認とtarball依存表記の再発防止テスト
 - 公開前tarballによる認証前停止モード付きsandbox最小試験
 - Cloudflare read-onlyによる試験用候補名の衝突確認
+- 管理画面からタグ作成、友だちへのタグ付与・解除を行う最小導線
+- タグ作成APIの空白名拒否、重複名409、trimの単体テスト
 
 未完了：
 

@@ -29,18 +29,23 @@ tags.get('/api/tags', async (c) => {
 tags.post('/api/tags', async (c) => {
   try {
     const body = await c.req.json<{ name: string; color?: string }>();
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
 
-    if (!body.name) {
+    if (!name) {
       return c.json({ success: false, error: 'name is required' }, 400);
     }
 
     const tag = await createTag(c.env.DB, {
-      name: body.name,
+      name,
       color: body.color,
     });
 
     return c.json({ success: true, data: serializeTag(tag) }, 201);
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (/UNIQUE constraint failed: tags\.name/i.test(message)) {
+      return c.json({ success: false, error: 'tag name already exists' }, 409);
+    }
     console.error('POST /api/tags error:', err);
     return c.json({ success: false, error: 'Internal server error' }, 500);
   }

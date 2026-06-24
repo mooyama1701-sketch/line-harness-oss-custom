@@ -119,6 +119,9 @@ export default function FriendListTable({ friends, allTags, onRefresh }: Props) 
                           onRemove={() => handleRemoveTag(friend.id, tag.id)}
                         />
                       ))}
+                      {friend.tags.length === 0 && (
+                        <span className="text-xs text-gray-400">付与済みタグはありません</span>
+                      )}
                     </div>
 
                     {isAddingTag ? (
@@ -148,18 +151,20 @@ export default function FriendListTable({ friends, allTags, onRefresh }: Props) 
                           キャンセル
                         </button>
                       </div>
+                    ) : allTags.length === 0 ? (
+                      <p className="text-xs text-gray-500">先に上部のタグ管理でタグを作成してください。</p>
+                    ) : availableTags.length === 0 ? (
+                      <p className="text-xs text-gray-500">追加できるタグはありません。</p>
                     ) : (
-                      availableTags.length > 0 && (
-                        <button
-                          onClick={() => setAddingTagForFriend(friend.id)}
-                          className="text-xs font-medium text-green-600 hover:text-green-700 flex items-center gap-1 transition-colors"
-                        >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                          タグを追加
-                        </button>
-                      )
+                      <button
+                        onClick={() => setAddingTagForFriend(friend.id)}
+                        className="text-xs font-medium text-green-600 hover:text-green-700 flex items-center gap-1 transition-colors"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        タグを追加
+                      </button>
                     )}
                   </div>
                 )}
