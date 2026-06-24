@@ -22,9 +22,10 @@ export default function TagBadge({ tag, onRemove }: TagBadgeProps) {
       {tag.name}
       {onRemove && (
         <button
+          type="button"
           onClick={onRemove}
           className="ml-0.5 hover:opacity-70 transition-opacity"
-          aria-label={`タグ「${tag.name}」を削除`}
+          aria-label={`タグ「${tag.name}」を解除`}
         >
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd"

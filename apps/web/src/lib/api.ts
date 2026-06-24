@@ -129,6 +129,7 @@ export type FriendListParams = {
 }
 
 export type FriendWithTags = Friend & { tags: Tag[] }
+export type TagWithFriendCount = Tag & { friendCount: number }
 /** Friend list items, optionally hydrated with chat status (when ?includeChatStatus=true) */
 export type FriendListItem = FriendWithTags & Partial<{
   latestIncomingMessage: { content: string; messageType: string; createdAt: string } | null
@@ -176,9 +177,9 @@ export const api = {
   },
   tags: {
     list: () =>
-      fetchApi<ApiResponse<Tag[]>>('/api/tags'),
+      fetchApi<ApiResponse<TagWithFriendCount[]>>('/api/tags'),
     create: (data: { name: string; color: string }) =>
-      fetchApi<ApiResponse<Tag>>('/api/tags', {
+      fetchApi<ApiResponse<TagWithFriendCount>>('/api/tags', {
         method: 'POST',
         body: JSON.stringify(data),
       }),

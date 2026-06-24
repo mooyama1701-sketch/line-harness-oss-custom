@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import type { Tag } from '@line-crm/shared'
-import { api } from '@/lib/api'
+import { api, type TagWithFriendCount } from '@/lib/api'
 
 interface Props {
-  tags: Tag[]
-  onCreated: (tag: Tag) => void
+  tags: TagWithFriendCount[]
+  onCreated: (tag: TagWithFriendCount) => void
 }
 
 const DEFAULT_TAG_COLOR = '#06C755'
@@ -50,30 +49,46 @@ export default function TagManagementPanel({ tags, onCreated }: Props) {
 
   return (
     <section className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-semibold text-gray-900">タグ管理</h2>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold text-gray-900">タグ管理</h2>
+            <span className="text-xs text-gray-500">{tags.length.toLocaleString('ja-JP')} 件</span>
+          </div>
+          <div className="mt-3 overflow-hidden rounded-md border border-gray-100">
             {tags.length === 0 ? (
-              <span className="text-xs text-gray-500">タグはまだありません。</span>
+              <div className="px-3 py-4 text-xs text-gray-500">タグはまだありません。</div>
             ) : (
-              tags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="inline-flex items-center max-w-full px-2 py-1 rounded text-xs font-medium"
-                  style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
-                  title={tag.name}
-                >
-                  <span className="truncate">{tag.name}</span>
-                </span>
-              ))
+              <div className="max-h-40 overflow-y-auto divide-y divide-gray-100">
+                {tags.map((tag) => (
+                  <div key={tag.id} className="grid grid-cols-[1fr_72px] items-center gap-3 px-3 py-2">
+                    <div className="min-w-0 flex items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: tag.color }}
+                        aria-hidden="true"
+                      />
+                      <span className="truncate text-xs font-medium text-gray-800" title={tag.name}>
+                        {tag.name}
+                      </span>
+                    </div>
+                    <span className="text-right text-xs text-gray-500">
+                      {tag.friendCount.toLocaleString('ja-JP')}人
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full lg:w-[360px]">
+        <form onSubmit={handleSubmit} className="w-full xl:w-[360px]">
+          <label className="block text-xs font-medium text-gray-600 mb-1" htmlFor="friend-tag-create">
+            新規タグ作成
+          </label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <input
+              id="friend-tag-create"
               type="text"
               value={name}
               onChange={(e) => {

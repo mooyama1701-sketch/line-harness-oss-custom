@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { getTags, createTag, deleteTag } from '@line-crm/db';
-import type { Tag as DbTag } from '@line-crm/db';
+import { getTagsWithFriendCount, createTag, deleteTag } from '@line-crm/db';
+import type { Tag as DbTag, TagWithFriendCount } from '@line-crm/db';
 import type { Env } from '../index.js';
 
 const tags = new Hono<Env>();
@@ -11,13 +11,14 @@ function serializeTag(row: DbTag) {
     name: row.name,
     color: row.color,
     createdAt: row.created_at,
+    friendCount: 'friend_count' in row ? (row as TagWithFriendCount).friend_count : 0,
   };
 }
 
 // GET /api/tags - list all tags
 tags.get('/api/tags', async (c) => {
   try {
-    const items = await getTags(c.env.DB);
+    const items = await getTagsWithFriendCount(c.env.DB);
     return c.json({ success: true, data: items.map(serializeTag) });
   } catch (err) {
     console.error('GET /api/tags error:', err);

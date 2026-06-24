@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { Hono } from 'hono';
 
 const dbMocks = {
-  getTags: vi.fn(),
+  getTagsWithFriendCount: vi.fn(),
   createTag: vi.fn(),
   deleteTag: vi.fn(),
 };
@@ -70,5 +70,34 @@ describe('POST /api/tags', () => {
     const body = (await res.json()) as { success: boolean; error: string };
     expect(body.success).toBe(false);
     expect(body.error).toBe('tag name already exists');
+  });
+});
+
+describe('GET /api/tags', () => {
+  test('returns tags with friendCount', async () => {
+    dbMocks.getTagsWithFriendCount.mockResolvedValue([
+      {
+        id: 'tag-1',
+        name: 'VIP',
+        color: '#06C755',
+        created_at: '2026-06-24T00:00:00.000+09:00',
+        friend_count: 3,
+      },
+    ]);
+
+    const res = await setupApp().request('/api/tags');
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      success: boolean;
+      data: Array<{ id: string; friendCount: number }>;
+    };
+    expect(body.success).toBe(true);
+    expect(body.data).toEqual([
+      expect.objectContaining({
+        id: 'tag-1',
+        friendCount: 3,
+      }),
+    ]);
   });
 });

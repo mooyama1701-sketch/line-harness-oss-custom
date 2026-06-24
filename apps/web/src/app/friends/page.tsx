@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { Tag } from '@line-crm/shared'
 import { api } from '@/lib/api'
-import type { FriendListItem } from '@/lib/api'
+import type { FriendListItem, TagWithFriendCount } from '@/lib/api'
 import Header from '@/components/layout/header'
 import FriendListTable from '@/components/friends/friend-list-table'
 import TagManagementPanel from '@/components/friends/tag-management-panel'
@@ -37,7 +36,7 @@ type ResponseFilter = 'all' | 'unhandled'
 export default function FriendsPage() {
   const { selectedAccountId } = useAccount()
   const [friends, setFriends] = useState<FriendListItem[]>([])
-  const [allTags, setAllTags] = useState<Tag[]>([])
+  const [allTags, setAllTags] = useState<TagWithFriendCount[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [hasNextPage, setHasNextPage] = useState(false)
@@ -128,8 +127,15 @@ export default function FriendsPage() {
   const handleSortChange = (v: SortMode) => updateAndResetPage(() => setSortMode(v))
   const handleResponseFilterChange = (v: ResponseFilter) => updateAndResetPage(() => setResponseFilter(v))
   const handleTagFilterChange = (v: string) => updateAndResetPage(() => setSelectedTagId(v))
-  const handleTagCreated = (tag: Tag) => {
+  const handleTagCreated = (tag: TagWithFriendCount) => {
     setAllTags((current) => [...current, tag].sort((a, b) => a.name.localeCompare(b.name, 'ja')))
+  }
+  const handleTagsChanged = (tags?: TagWithFriendCount[]) => {
+    if (tags) {
+      setAllTags(tags)
+    } else {
+      loadTags()
+    }
   }
 
   return (
@@ -225,7 +231,12 @@ export default function FriendsPage() {
           ))}
         </div>
       ) : (
-        <FriendListTable friends={friends} allTags={allTags} onRefresh={loadFriends} />
+        <FriendListTable
+          friends={friends}
+          allTags={allTags}
+          onRefresh={loadFriends}
+          onTagsChanged={handleTagsChanged}
+        />
       )}
 
       {!loading && total > 0 && (

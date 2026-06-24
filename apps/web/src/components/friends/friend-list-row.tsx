@@ -6,7 +6,7 @@ import TagBadge from './tag-badge'
 
 interface Props {
   friend: FriendListItem
-  // Toggles the inline tag-management section underneath the row. Wired up
+  // Opens the tag-management modal. Wired up
   // to a discrete button (with stopPropagation) inside this component, NOT
   // to the row body — the row body navigates to /chats and we don't want
   // the tag-edit affordance to compete with that primary click target.
@@ -18,7 +18,7 @@ interface Props {
 // Clicking the row navigates to the per-friend chat view at
 // `/chats?friend=<id>` so the operator can read history / reply / mark as
 // resolved without leaving the list. The "タグ" button at the end of the
-// last column opens an inline tag editor (handled by the parent table).
+// last column opens tag editing (handled by the parent table).
 export default function FriendListRow({ friend, onTagEditClick }: Props) {
   const router = useRouter()
   const navigateToChat = () => router.push(`/chats?friend=${friend.id}`)

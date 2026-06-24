@@ -6,6 +6,10 @@ export interface Tag {
   created_at: string;
 }
 
+export interface TagWithFriendCount extends Tag {
+  friend_count: number;
+}
+
 export interface FriendTag {
   friend_id: string;
   tag_id: string;
@@ -16,6 +20,24 @@ export async function getTags(db: D1Database): Promise<Tag[]> {
   const result = await db
     .prepare(`SELECT * FROM tags ORDER BY name ASC`)
     .all<Tag>();
+  return result.results;
+}
+
+export async function getTagsWithFriendCount(db: D1Database): Promise<TagWithFriendCount[]> {
+  const result = await db
+    .prepare(
+      `SELECT
+         t.id,
+         t.name,
+         t.color,
+         t.created_at,
+         COUNT(ft.friend_id) AS friend_count
+       FROM tags t
+       LEFT JOIN friend_tags ft ON ft.tag_id = t.id
+       GROUP BY t.id, t.name, t.color, t.created_at
+       ORDER BY t.name ASC`,
+    )
+    .all<TagWithFriendCount>();
   return result.results;
 }
 
