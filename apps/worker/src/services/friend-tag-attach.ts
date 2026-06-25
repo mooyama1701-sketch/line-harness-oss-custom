@@ -7,9 +7,8 @@ import { fireEvent } from './event-bus.js';
 // 新規付与のときだけ side effects を発火する (`changes` を見る)。同じ friend に同じ tag を
 // 自動付与で繰り返し叩いたとき、シナリオの重複 enrollment や tag_change の重複発火を防ぐ。
 //
-// POST /api/friends/:id/tags は手動操作の signal として「毎クリックで発火」する設計のため、
-// この helper には合流させていない (重複 enroll はチェックがあるが tag_change は冪等でない)。
-// 自動経路 (予約 auto-tag 等) はここ経由で呼ぶ。
+// 手動操作の POST /api/friends/:id/tags もここを通す。すでに同じタグが付いている
+// 友だちへ再付与しても、tag_change や tag_added シナリオを二重発火させないため。
 export async function attachTagAndFireSideEffects(
   db: D1Database,
   friendId: string,

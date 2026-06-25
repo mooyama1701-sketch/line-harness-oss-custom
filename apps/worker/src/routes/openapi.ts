@@ -197,12 +197,25 @@ const spec = {
       },
     },
     '/api/friends/{id}/tags': {
+      get: {
+        tags: ['Friends'],
+        summary: '友だちのタグ一覧取得',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Assigned tags' },
+          '404': { description: 'Friend not found' },
+        },
+      },
       post: {
         tags: ['Friends'],
         summary: '友だちにタグ追加',
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
         requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { tagId: { type: 'string' } }, required: ['tagId'] } } } },
-        responses: { '201': { description: 'Tag added' } },
+        responses: {
+          '201': { description: 'Tag added' },
+          '200': { description: 'Tag already assigned' },
+          '404': { description: 'Friend or tag not found' },
+        },
       },
     },
     '/api/friends/{id}/tags/{tagId}': {
@@ -213,7 +226,10 @@ const spec = {
           { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
           { name: 'tagId', in: 'path', required: true, schema: { type: 'string' } },
         ],
-        responses: { '200': { description: 'Tag removed' } },
+        responses: {
+          '200': { description: 'Tag removed or already unassigned' },
+          '404': { description: 'Friend or tag not found' },
+        },
       },
     },
     // ── Tags ────────────────────────────────────────────────────────────────

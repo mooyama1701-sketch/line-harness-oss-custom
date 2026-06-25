@@ -118,6 +118,42 @@
 1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
 2. `docs/INSTALLATION_TEST_PLAN.md` に従い、使用Cloudflareアカウントと試験用リソース名を確定し、npm registry経由のpackage取得試験またはCloudflare実作成試験へ進む
 
+## 友だちタグ付与・解除API整備（2026-06-25）
+
+対象：
+
+- 友だち管理画面のタグ表示・タグ編集モーダル
+- 友だちタグAPI：`/api/friends/:id/tags`
+- 既存DBテーブル：`friends`、`tags`、`tag_folders`、`friend_tags`
+
+確認した既存実装：
+
+- `friend_tags` は既に存在し、`PRIMARY KEY (friend_id, tag_id)` により同じ友だちへ同じタグを二重登録しない構造。
+- `tags` と `tag_folders` は `046_tag_folders.sql`、`schema.sql`、`bootstrap.sql` に反映済み。
+- 友だち一覧画面ではタグバッジ表示、タグ編集モーダル、タグ絞り込みが既に実装済み。
+- シナリオ詳細画面の友だち手動登録UIは既存API `POST /api/scenarios/:id/enroll/:friendId` を使用しており、今回の変更対象外。
+
+実施内容：
+
+- `GET /api/friends/:id/tags` を追加し、友だちに付与済みのタグ一覧を取得できるようにした。
+- `POST /api/friends/:id/tags` で、存在しない friendId / tagId を404として返すようにした。
+- 同じ友だちへ同じタグを再付与した場合は200で成功扱いにし、`tag_change` や `tag_added` シナリオ副作用を二重発火させないようにした。
+- `DELETE /api/friends/:id/tags/:tagId` で、存在しない friendId / tagId を404として返すようにした。
+- 未付与タグの解除は200で成功扱いにし、不要な副作用を発火させないようにした。
+- OpenAPIの簡易定義に、友だちタグ一覧取得と404/二重追加時レスポンスを追記した。
+- API単体テストを追加した。
+
+DB migration：
+
+- 追加なし。
+- 既存 `friend_tags`、`tags`、`tag_folders` を使用するため、破壊的DB変更は不要。
+
+未実施：
+
+- Cloudflare deployは未実施。
+- 本番D1、本番Worker、本番Pages、本番LINE設定、npm publishは未実施。
+- タグ追加をトリガーにした新規のシナリオ自動開始機能、シナリオ分岐、一斉配信は今回追加していない。
+
 ## 現在のローカル環境
 
 | 項目 | 状態 | バージョン・内容 | 確認日 |

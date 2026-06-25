@@ -3,15 +3,13 @@ import {
   getFriends,
   getFriendById,
   getFriendCount,
-  addTagToFriend,
   removeTagFromFriend,
   getFriendTags,
-  getScenarios,
-  enrollFriendInScenario,
   jstNow,
 } from '@line-crm/db';
 import type { Friend as DbFriend, Tag as DbTag } from '@line-crm/db';
 import { fireEvent } from '../services/event-bus.js';
+import { attachTagAndFireSideEffects } from '../services/friend-tag-attach.js';
 import { buildMessage } from '../services/step-delivery.js';
 import type { Env } from '../index.js';
 
@@ -76,6 +74,18 @@ function serializeTag(row: DbTag) {
     color: row.color,
     createdAt: row.created_at,
   };
+}
+
+async function getTagById(db: D1Database, tagId: string): Promise<DbTag | null> {
+  return await db.prepare(`SELECT * FROM tags WHERE id = ?`).bind(tagId).first<DbTag>();
+}
+
+async function hasFriendTag(db: D1Database, friendId: string, tagId: string): Promise<boolean> {
+  const row = await db
+    .prepare(`SELECT 1 FROM friend_tags WHERE friend_id = ? AND tag_id = ?`)
+    .bind(friendId, tagId)
+    .first();
+  return Boolean(row);
 }
 
 // GET /api/friends - list with pagination
@@ -417,6 +427,25 @@ friends.get('/api/friends/:id', async (c) => {
   }
 });
 
+// GET /api/friends/:id/tags - list assigned tags for a friend
+friends.get('/api/friends/:id/tags', async (c) => {
+  try {
+    const friendId = c.req.param('id');
+    const db = c.env.DB;
+
+    const friend = await getFriendById(db, friendId);
+    if (!friend) {
+      return c.json({ success: false, error: 'Friend not found' }, 404);
+    }
+
+    const tags = await getFriendTags(db, friendId);
+    return c.json({ success: true, data: tags.map(serializeTag) });
+  } catch (err) {
+    console.error('GET /api/friends/:id/tags error:', err);
+    return c.json({ success: false, error: 'Internal server error' }, 500);
+  }
+});
+
 // POST /api/friends/:id/tags - add tag
 friends.post('/api/friends/:id/tags', async (c) => {
   try {
@@ -428,26 +457,20 @@ friends.post('/api/friends/:id/tags', async (c) => {
     }
 
     const db = c.env.DB;
-    await addTagToFriend(db, friendId, body.tagId);
-
-    // Enroll in tag_added scenarios that match this tag
-    const allScenarios = await getScenarios(db);
-    for (const scenario of allScenarios) {
-      if (scenario.trigger_type === 'tag_added' && scenario.is_active && scenario.trigger_tag_id === body.tagId) {
-        const existing = await db
-          .prepare(`SELECT id FROM friend_scenarios WHERE friend_id = ? AND scenario_id = ?`)
-          .bind(friendId, scenario.id)
-          .first();
-        if (!existing) {
-          await enrollFriendInScenario(db, friendId, scenario.id);
-        }
-      }
+    const [friend, tag] = await Promise.all([
+      getFriendById(db, friendId),
+      getTagById(db, body.tagId),
+    ]);
+    if (!friend) {
+      return c.json({ success: false, error: 'Friend not found' }, 404);
+    }
+    if (!tag) {
+      return c.json({ success: false, error: 'Tag not found' }, 404);
     }
 
-    // イベントバス発火: tag_change
-    await fireEvent(db, 'tag_change', { friendId, eventData: { tagId: body.tagId, action: 'add' } });
+    const result = await attachTagAndFireSideEffects(db, friendId, body.tagId);
 
-    return c.json({ success: true, data: null }, 201);
+    return c.json({ success: true, data: null }, result.added ? 201 : 200);
   } catch (err) {
     console.error('POST /api/friends/:id/tags error:', err);
     return c.json({ success: false, error: 'Internal server error' }, 500);
@@ -459,11 +482,27 @@ friends.delete('/api/friends/:id/tags/:tagId', async (c) => {
   try {
     const friendId = c.req.param('id');
     const tagId = c.req.param('tagId');
+    const db = c.env.DB;
 
-    await removeTagFromFriend(c.env.DB, friendId, tagId);
+    const [friend, tag, assigned] = await Promise.all([
+      getFriendById(db, friendId),
+      getTagById(db, tagId),
+      hasFriendTag(db, friendId, tagId),
+    ]);
+    if (!friend) {
+      return c.json({ success: false, error: 'Friend not found' }, 404);
+    }
+    if (!tag) {
+      return c.json({ success: false, error: 'Tag not found' }, 404);
+    }
+    if (!assigned) {
+      return c.json({ success: true, data: null });
+    }
+
+    await removeTagFromFriend(db, friendId, tagId);
 
     // イベントバス発火: tag_change
-    await fireEvent(c.env.DB, 'tag_change', { friendId, eventData: { tagId, action: 'remove' } });
+    await fireEvent(db, 'tag_change', { friendId, eventData: { tagId, action: 'remove' } });
 
     return c.json({ success: true, data: null });
   } catch (err) {
