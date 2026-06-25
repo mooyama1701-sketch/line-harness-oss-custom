@@ -4,7 +4,7 @@
 
 - 最終更新日：2026-06-25
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。Cloudflare read-only確認では試験用候補名が未使用であることを確認済み。管理画面の友だちリストにタグ一覧・新規作成を追加し、友だち一覧/詳細から既存タグを付与・解除できるタグ管理導線を実装済み。友だち一覧のタグ編集はモーダル化し、既存タグ検索、新規タグ作成、作成後の即時付与、付与人数表示に対応済み。友だちタグAPIは、タグ一覧取得、存在しない友だち/タグIDの404、二重追加時の冪等処理に対応済み。Lステップ風の独立したタグ管理画面として、サイドメニュー「タグ管理」、新規タグ作成、タグフォルダ作成、フォルダ別表示、タグ移動、タグ/フォルダ削除を実装済み。シナリオ詳細画面から友だちを手動でシナリオ登録するUIを実装し、dev Admin Pagesへ反映済み。localhost開発時のAdminログイン用に、loopback WorkerでのみCookie Secure属性を外し、Vite dev serverのcredentialed CORSをlocalhost限定で許可する調整を実装済み。dev実環境 `line-harness-custom-dev` 系へ `046_tag_folders.sql`、Worker、Admin Pagesを反映し、`/tags` とログイン画面の到達、Admin originからWorkerへのCORS preflight成功を確認済み。dev管理画面で `テストシナリオ２` へ友だちを手動登録し、重複登録メッセージ、stats再取得、cronによるステップ配信ログ作成まで確認済み。Cloudflare新規フルセットアップ試験、LINE試験、npm registry経由の正式package取得試験は未実施。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。Cloudflare read-only確認では試験用候補名が未使用であることを確認済み。管理画面の友だちリストにタグ一覧・新規作成を追加し、友だち一覧/詳細から既存タグを付与・解除できるタグ管理導線を実装済み。友だち一覧のタグ編集はモーダル化し、既存タグ検索、新規タグ作成、作成後の即時付与、付与人数表示に対応済み。友だちタグAPIは、タグ一覧取得、存在しない友だち/タグIDの404、二重追加時の冪等処理に対応済み。Lステップ風の独立したタグ管理画面として、サイドメニュー「タグ管理」、新規タグ作成、タグフォルダ作成、フォルダ別表示、タグ移動、タグ/フォルダ削除を実装済み。シナリオ詳細画面から友だちを手動でシナリオ登録するUIを実装し、dev Admin Pagesへ反映済み。localhost開発時のAdminログイン用に、loopback WorkerでのみCookie Secure属性を外し、Vite dev serverのcredentialed CORSをlocalhost限定で許可する調整を実装済み。直近3commit（友だちタグAPI堅牢化、シナリオ手動登録UI、localhost開発ログイン修正）をdev Workerとdev Admin Pagesへ反映し、dev管理画面でタグ管理、友だちタグ付与・解除、二重付与、タグ絞り込み、シナリオ手動登録、重複登録表示、dev Cookie属性を確認済み。Cloudflare新規フルセットアップ試験、LINE試験、npm registry経由の正式package取得試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -73,6 +73,7 @@
 - [x] シナリオ詳細画面に、友だち検索と手動シナリオ登録UIを追加
 - [x] dev Admin Pagesへシナリオ手動登録UIを反映し、`テストシナリオ２` への手動登録、重複登録表示、stats再取得、cron配信ログを確認
 - [x] localhost開発時のAdminログイン用に、loopback WorkerだけCookie Secure属性を外し、Vite dev serverのCORSをlocalhost限定で調整
+- [x] 直近3commitをdev Worker / dev Admin Pagesへ反映し、タグ管理・友だちタグ編集・シナリオ手動登録・認証Cookie属性を実画面で確認
 
 初期リリース準備状況：
 
@@ -109,6 +110,7 @@
 - dev実環境へのタグフォルダmigration、Worker deploy、Admin Pages deploy
 - dev Admin Pagesでのシナリオ手動登録UI確認（`テストシナリオ２`、友だち `KAZU@KOKE`、重複登録表示、cron配信ログ確認）
 - localhost開発時のAdminログイン調整（production/deployed WorkerではCookie Secure維持、localhost CORSのみ許可）
+- 直近3commitのdev反映確認（Worker `c6241760-b7ca-4ba8-acfd-d9b9df3af687`、Admin Pages `f862b6d3`）
 
 未完了：
 
@@ -190,6 +192,52 @@ DB migration：
 - Cloudflare deployは未実施。
 - 本番D1、本番Worker、本番Pages、本番LINE設定、npm publishは未実施。
 - タグ追加をトリガーにした新規のシナリオ自動開始機能、シナリオ分岐、一斉配信は今回追加していない。
+
+## 直近3commit dev反映確認（2026-06-25）
+
+対象commit：
+
+- `116ad2499b0cc9491b0d3b9575c1fa998fb48918`：友だちタグAPI堅牢化
+- `5cc37fbc34233a6263848accb10e62d0cf270284`：シナリオ詳細画面での友だち手動登録UI
+- `de27de8d9829ce2ccb342b1830c2946d812a73ab`：localhost開発ログイン修正
+
+反映先：
+
+- dev Worker：`line-harness-custom-dev`
+- dev Worker URL：`https://line-harness-custom-dev.x-picard1701.workers.dev`
+- dev Worker Version ID：`c6241760-b7ca-4ba8-acfd-d9b9df3af687`
+- dev Admin Pages：`line-harness-custom-dev-admin-fb2091b6`
+- dev Admin Pages deploy：`https://f862b6d3.line-harness-custom-dev-admin-fb2091b6.pages.dev`
+- 管理画面URL：`https://line-harness-custom-dev-admin-fb2091b6.pages.dev`
+
+実施内容：
+
+- 未追跡のVS Code workspaceファイル `docs/LINE-Harness-oss-Custom.code-workspace` を削除し、作業ツリーcleanを確認。
+- 直近3commitに `packages/db` / `packages/db/migrations` の変更がないことを確認し、新規D1 migrationは不要と判断。
+- `pnpm --filter worker test`、`pnpm --filter worker typecheck`、`pnpm --filter worker build` が成功。
+- `NEXT_PUBLIC_API_URL=https://line-harness-custom-dev.x-picard1701.workers.dev pnpm --filter web build` が成功。
+- dev Workerへ一時dev専用wrangler設定でdeploy。Secretsは既存のまま、D1/R2 bindingsとplain varsをdev値で維持。
+- dev Admin Pagesへ `wrangler pages deploy out --project-name line-harness-custom-dev-admin-fb2091b6 --branch main --commit-dirty=true --commit-hash de27de8d9829ce2ccb342b1830c2946d812a73ab` で反映。
+
+実画面確認：
+
+- dev管理画面へログインできることを確認。
+- 画面フッターのbuild表示が `de27de8d9829` になっていることを確認。
+- タグ管理画面でタグフォルダ、タグ一覧、人数、フォルダ移動UIが表示されることを確認。
+- 既存検証タグを一時的に別フォルダへ移動し、元のフォルダへ戻せることを確認。
+- 友だち一覧でタグ表示、タグ絞り込み、タグ編集モーダルが崩れていないことを確認。
+- `KAZU@KOKE` に既存タグ `女性` を付与し、一覧表示に反映されることを確認後、解除して元の状態へ戻した。
+- 既存タグ `男性` の二重付与APIをログイン済みブラウザセッションから2回実行し、どちらも200/successになることを確認。
+- シナリオ一覧と `テストシナリオ２` の詳細画面が開けることを確認。
+- シナリオ詳細画面で友だち検索欄に `KAZU` を入力し、`KAZU@KOKE` を選択できることを確認。
+- `テストシナリオ２` へ `KAZU@KOKE` を手動登録し、statsが `登録 1 人 / 進行中 1 人` へ再取得されることを確認。
+- 同じ友だちを再登録した場合、`この友だちは既にこのシナリオに登録済みです` と表示されることを確認。
+- dev Workerの認証Cookieは `SameSite=None; Secure` を維持し、`lh_admin_session` はHttpOnly、`lh_csrf` は非HttpOnlyであることを値を出さずに確認。
+
+安全確認：
+
+- D1 migrationは実行していない。
+- 本番Worker、本番Pages、本番D1、本番LINE設定、npm publish、GitHub pushは未実施。
 
 ## 現在のローカル環境
 
