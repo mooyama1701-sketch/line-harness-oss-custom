@@ -8,4 +8,12 @@ import { defineConfig } from "vite";
 // 既存の form / Google Calendar booking 利用者には load されない。
 export default defineConfig({
   plugins: [cloudflare(), react(), tailwindcss()],
+  server: {
+    // Vite handles local OPTIONS preflights before the Worker app sees them.
+    // The admin SPA uses credentials: 'include', so browsers require this.
+    cors: {
+      origin: /^http:\/\/localhost:\d+$/,
+      credentials: true,
+    },
+  },
 });

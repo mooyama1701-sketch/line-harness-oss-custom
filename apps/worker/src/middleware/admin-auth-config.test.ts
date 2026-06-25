@@ -102,6 +102,15 @@ describe('resolveAdminAuthConfig — topology guard', () => {
     const cfg = resolveAdminAuthConfig({ WORKER_URL: WORKERS });
     expect(cfg.crossSite).toBe(false);
     expect(cfg.sameSite).toBe('Lax');
+    expect(cfg.secure).toBe(true);
+    expect(cfg.misconfigured).toBeNull();
+  });
+
+  test('loopback Worker origin omits Secure only for local HTTP development', () => {
+    const cfg = resolveAdminAuthConfig({ WORKER_URL: 'http://localhost:5173' });
+    expect(cfg.crossSite).toBe(false);
+    expect(cfg.sameSite).toBe('Lax');
+    expect(cfg.secure).toBe(false);
     expect(cfg.misconfigured).toBeNull();
   });
 
@@ -113,6 +122,7 @@ describe('resolveAdminAuthConfig — topology guard', () => {
       { requestOrigin: WORKERS },
     );
     expect(cfg.crossSite).toBe(true);
+    expect(cfg.secure).toBe(true);
     expect(cfg.misconfigured).toMatch(/cross-site/i);
   });
 

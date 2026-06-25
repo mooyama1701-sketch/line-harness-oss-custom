@@ -44,8 +44,8 @@ adminAuth.post('/api/auth/login', async (c) => {
   }
 
   const csrfToken = crypto.randomUUID();
-  c.header('Set-Cookie', adminSessionCookie(apiKey, config.sameSite), { append: true });
-  c.header('Set-Cookie', csrfCookie(csrfToken, config.sameSite), { append: true });
+  c.header('Set-Cookie', adminSessionCookie(apiKey, config.sameSite, config.secure), { append: true });
+  c.header('Set-Cookie', csrfCookie(csrfToken, config.sameSite, config.secure), { append: true });
   return c.json({ success: true, data: staff, csrfToken });
 });
 
@@ -55,9 +55,9 @@ adminAuth.post('/api/auth/login', async (c) => {
  * even if the CSRF token was lost client-side.
  */
 adminAuth.post('/api/auth/logout', async (c) => {
-  const { sameSite } = resolveAdminAuthConfig(c.env, { requestOrigin: new URL(c.req.url).origin });
-  c.header('Set-Cookie', expiredCookie(ADMIN_AUTH_COOKIE, sameSite), { append: true });
-  c.header('Set-Cookie', expiredCookie(CSRF_COOKIE, sameSite), { append: true });
+  const config = resolveAdminAuthConfig(c.env, { requestOrigin: new URL(c.req.url).origin });
+  c.header('Set-Cookie', expiredCookie(ADMIN_AUTH_COOKIE, config.sameSite, config.secure), { append: true });
+  c.header('Set-Cookie', expiredCookie(CSRF_COOKIE, config.sameSite, config.secure), { append: true });
   return c.json({ success: true, data: null });
 });
 
@@ -72,7 +72,7 @@ adminAuth.get('/api/auth/session', async (c) => {
   let csrfToken = csrfTokenFromCookie(c);
   if (!csrfToken) {
     csrfToken = crypto.randomUUID();
-    c.header('Set-Cookie', csrfCookie(csrfToken, config.sameSite), { append: true });
+    c.header('Set-Cookie', csrfCookie(csrfToken, config.sameSite, config.secure), { append: true });
   }
   return c.json({ success: true, data: c.get('staff'), csrfToken });
 });
