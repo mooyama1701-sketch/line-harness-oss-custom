@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 
 import Link from 'next/link'
 import type { Scenario, ScenarioStep, ScenarioTriggerType, MessageType, DeliveryMode } from '@line-crm/shared'
-import { api } from '@/lib/api'
+import { api, type FriendListItem } from '@/lib/api'
 import Header from '@/components/layout/header'
 import FlexPreviewComponent from '@/components/flex-preview'
 import ScheduleInput, {
@@ -157,8 +157,19 @@ export default function ScenarioDetailClient({ scenarioId }: { scenarioId: strin
   const [stats, setStats] = useState<ScenarioStats | null>(null)
   const [templates, setTemplates] = useState<TemplateOpt[]>([])
   const [tags, setTags] = useState<TagOpt[]>([])
+  const [friendSearch, setFriendSearch] = useState('')
+  const [friendOptions, setFriendOptions] = useState<FriendListItem[]>([])
+  const [selectedFriendId, setSelectedFriendId] = useState('')
+  const [friendLoading, setFriendLoading] = useState(false)
+  const [enrollSaving, setEnrollSaving] = useState(false)
+  const [enrollMessage, setEnrollMessage] = useState('')
+  const [enrollError, setEnrollError] = useState('')
 
   const deliveryMode: DeliveryMode = (scenario?.deliveryMode ?? 'relative') as DeliveryMode
+  const selectedFriend = useMemo(
+    () => friendOptions.find((friend) => friend.id === selectedFriendId) ?? null,
+    [friendOptions, selectedFriendId],
+  )
 
   const loadScenario = useCallback(async () => {
     setLoading(true)
@@ -214,9 +225,70 @@ export default function ScenarioDetailClient({ scenarioId }: { scenarioId: strin
     return () => { cancelled = true }
   }, [id])
 
+  useEffect(() => {
+    let cancelled = false
+    const timer = window.setTimeout(() => {
+      setFriendLoading(true)
+      api.friends.list({
+        limit: 20,
+        search: friendSearch.trim() || undefined,
+        includeTags: false,
+        sort: 'recent',
+      }).then((res) => {
+        if (cancelled) return
+        if (res.success) {
+          setFriendOptions(res.data.items)
+          setSelectedFriendId((current) => {
+            if (current && res.data.items.some((friend) => friend.id === current)) return current
+            return res.data.items[0]?.id ?? ''
+          })
+        }
+      }).catch(() => {
+        if (!cancelled) {
+          setFriendOptions([])
+          setSelectedFriendId('')
+        }
+      }).finally(() => {
+        if (!cancelled) setFriendLoading(false)
+      })
+    }, 250)
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [friendSearch])
+
   const reloadStats = useCallback(() => {
     api.scenarios.stats(id).then((r) => { if (r.success) setStats(r.data) }).catch(() => {})
   }, [id])
+
+  const handleEnrollFriend = async () => {
+    if (!selectedFriendId) {
+      setEnrollError('登録する友だちを選択してください')
+      setEnrollMessage('')
+      return
+    }
+    setEnrollSaving(true)
+    setEnrollError('')
+    setEnrollMessage('')
+    try {
+      const res = await api.scenarios.enroll(id, selectedFriendId)
+      if (res.success) {
+        const nextAt = res.data.nextDeliveryAt
+          ? new Date(res.data.nextDeliveryAt).toLocaleString('ja-JP')
+          : '未設定'
+        setEnrollMessage(`${selectedFriend?.displayName ?? '選択した友だち'}を登録しました。次回配信予定: ${nextAt}`)
+        reloadStats()
+      } else {
+        setEnrollError(res.error || 'シナリオ登録に失敗しました')
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : ''
+      setEnrollError(message.includes('409') ? 'この友だちは既にこのシナリオに登録済みです' : 'シナリオ登録に失敗しました')
+    } finally {
+      setEnrollSaving(false)
+    }
+  }
 
   const handleSaveScenario = async () => {
     if (!editForm.name.trim()) return
@@ -549,6 +621,80 @@ export default function ScenarioDetailClient({ scenarioId }: { scenarioId: strin
               <span>作成日: {new Date(scenario.createdAt).toLocaleDateString('ja-JP')}</span>
             </div>
           </div>
+        )}
+      </div>
+
+      {/* Manual Enrollment */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-800">友だちを登録</h3>
+          </div>
+          {stats && (
+            <div className="text-xs text-gray-500">
+              登録 {stats.enrolledTotal} 人 / 進行中 {stats.activeNow} 人
+            </div>
+          )}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(220px,320px)_auto] gap-3 items-end">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1" htmlFor="scenario-friend-search">
+              友だち検索
+            </label>
+            <input
+              id="scenario-friend-search"
+              type="search"
+              className="w-full min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="表示名で検索"
+              value={friendSearch}
+              onChange={(e) => setFriendSearch(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1" htmlFor="scenario-friend-select">
+              登録する友だち
+            </label>
+            <select
+              id="scenario-friend-select"
+              className="w-full min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white disabled:bg-gray-50 disabled:text-gray-400"
+              value={selectedFriendId}
+              onChange={(e) => {
+                setSelectedFriendId(e.target.value)
+                setEnrollError('')
+                setEnrollMessage('')
+              }}
+              disabled={friendLoading || friendOptions.length === 0}
+            >
+              {friendOptions.length === 0 ? (
+                <option value="">{friendLoading ? '読み込み中...' : '友だちが見つかりません'}</option>
+              ) : (
+                friendOptions.map((friend) => (
+                  <option key={friend.id} value={friend.id}>
+                    {friend.displayName || friend.lineUserId}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+          <button
+            type="button"
+            onClick={handleEnrollFriend}
+            disabled={enrollSaving || friendLoading || !selectedFriendId}
+            className="min-h-[44px] px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 transition-opacity hover:opacity-90"
+            style={{ backgroundColor: '#06C755' }}
+          >
+            {enrollSaving ? '登録中...' : '登録'}
+          </button>
+        </div>
+        {enrollMessage && (
+          <p className="mt-3 text-xs text-green-700 bg-green-50 border border-green-100 rounded-md px-3 py-2">
+            {enrollMessage}
+          </p>
+        )}
+        {enrollError && (
+          <p className="mt-3 text-xs text-red-600 bg-red-50 border border-red-100 rounded-md px-3 py-2">
+            {enrollError}
+          </p>
         )}
       </div>
 

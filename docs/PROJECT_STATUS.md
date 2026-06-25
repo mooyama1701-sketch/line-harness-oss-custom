@@ -2,9 +2,9 @@
 
 ## 基本情報
 
-- 最終更新日：2026-06-24
+- 最終更新日：2026-06-25
 - 現在のフェーズ：フェーズ1：現状調査・プロジェクト準備
-- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。Cloudflare read-only確認では試験用候補名が未使用であることを確認済み。管理画面の友だちリストにタグ一覧・新規作成を追加し、友だち一覧/詳細から既存タグを付与・解除できるタグ管理導線を実装済み。友だち一覧のタグ編集はモーダル化し、既存タグ検索、新規タグ作成、作成後の即時付与、付与人数表示に対応済み。Lステップ風の独立したタグ管理画面として、サイドメニュー「タグ管理」、新規タグ作成、タグフォルダ作成、フォルダ別表示、タグ移動、タグ/フォルダ削除を実装済み。dev実環境 `line-harness-custom-dev` 系へ `046_tag_folders.sql`、Worker、Admin Pagesを反映し、`/tags` とログイン画面の到達、Admin originからWorkerへのCORS preflight成功を確認済み。Cloudflare新規フルセットアップ試験、LINE試験、npm registry経由の正式package取得試験は未実施。
+- 全体ステータス：公式リポジトリのForkを正式作業場所 `/Users/mooyama/codex/LINE-Harness-oss-Custom` へ統合済み。`v0.15.0`起点の `custom/main` に優先未リリース2コミット（CI修正、LIFFセキュリティ修正）、Admin build fingerprint、Worker CORS Variables対応を正式取り込み済み。改造版初期リリース向けP0対応として、自動update無効化、改造版ソースの固定参照、Cloudflare同名リソース時の停止処理を実装済み。P1対応として、ローカル設定名、setup package名、setup CLI bin名、MCP登録名、MCP package名、MCP bin名、MCP内部server名の分離、LICENSE本文と元OSSクレジットのnpm package同梱を実装済み。新規環境インストール試験計画を `docs/INSTALLATION_TEST_PLAN.md` に文書化済み。setupの認証前停止モードを実装済み。`packages/create-line-harness` の正式pack方法は `pnpm pack` と確認済みで、tarball内の `@line-harness/update-engine` は `^0.0.2` へ変換される。公開前tarballによる認証前停止モード付きsandbox最小試験は成功済み。Cloudflare read-only確認では試験用候補名が未使用であることを確認済み。管理画面の友だちリストにタグ一覧・新規作成を追加し、友だち一覧/詳細から既存タグを付与・解除できるタグ管理導線を実装済み。友だち一覧のタグ編集はモーダル化し、既存タグ検索、新規タグ作成、作成後の即時付与、付与人数表示に対応済み。友だちタグAPIは、タグ一覧取得、存在しない友だち/タグIDの404、二重追加時の冪等処理に対応済み。Lステップ風の独立したタグ管理画面として、サイドメニュー「タグ管理」、新規タグ作成、タグフォルダ作成、フォルダ別表示、タグ移動、タグ/フォルダ削除を実装済み。シナリオ詳細画面から友だちを手動でシナリオ登録するUIを実装し、dev Admin Pagesへ反映済み。dev実環境 `line-harness-custom-dev` 系へ `046_tag_folders.sql`、Worker、Admin Pagesを反映し、`/tags` とログイン画面の到達、Admin originからWorkerへのCORS preflight成功を確認済み。dev管理画面で `テストシナリオ２` へ友だちを手動登録し、重複登録メッセージ、stats再取得、cronによるステップ配信ログ作成まで確認済み。Cloudflare新規フルセットアップ試験、LINE試験、npm registry経由の正式package取得試験は未実施。
 - 次の主要目標：改造版初期差分の設計。
 
 ## 現在のゴール
@@ -66,9 +66,12 @@
 - [x] タグ作成APIの空白名、trim、重複409の単体テストを追加
 - [x] 友だち一覧のタグ編集をモーダル化し、付与済みタグ、既存タグ検索、新規タグ作成、作成後の即時付与を同一画面で操作できるようにした
 - [x] タグ一覧APIとタグ管理パネルに、既存 `friend_tags` 集計による付与人数表示を追加
+- [x] 友だちタグAPIで、友だち別タグ一覧取得、存在しない friend/tag の404、二重追加時の副作用抑止を実装
 - [x] サイドメニューに独立した「タグ管理」を追加し、タグ作成・フォルダ作成・フォルダ別表示・タグ移動ができるLステップ風UIを追加
 - [x] `tag_folders` と `tags.folder_id` を追加し、新規インストール用 `bootstrap.sql` とマイグレーションを同期
 - [x] dev実環境 `line-harness-custom-dev` D1へ `046_tag_folders.sql` を適用し、WorkerとAdmin Pagesへタグ管理UIを反映
+- [x] シナリオ詳細画面に、友だち検索と手動シナリオ登録UIを追加
+- [x] dev Admin Pagesへシナリオ手動登録UIを反映し、`テストシナリオ２` への手動登録、重複登録表示、stats再取得、cron配信ログを確認
 
 初期リリース準備状況：
 
@@ -99,8 +102,11 @@
 - 管理画面からタグ作成、友だちへのタグ付与・解除を行う最小導線
 - タグ作成APIの空白名拒否、重複名409、trimの単体テスト
 - 友だち一覧のタグ編集モーダル化と、タグ一覧の付与人数表示
+- 友だちタグAPIの一覧取得、付与、解除、二重追加、存在しないIDエラーの単体テスト
 - Lステップ風の独立タグ管理UI（サイドメニュー、タグ作成、フォルダ作成、フォルダ別表示、タグ移動）
+- シナリオ詳細からの友だち手動登録UI
 - dev実環境へのタグフォルダmigration、Worker deploy、Admin Pages deploy
+- dev Admin Pagesでのシナリオ手動登録UI確認（`テストシナリオ２`、友だち `KAZU@KOKE`、重複登録表示、cron配信ログ確認）
 
 未完了：
 
@@ -117,6 +123,35 @@
 
 1. 初期リリース直前に、setup用clone元の固定commitを最終リリースcommitへ更新する
 2. `docs/INSTALLATION_TEST_PLAN.md` に従い、使用Cloudflareアカウントと試験用リソース名を確定し、npm registry経由のpackage取得試験またはCloudflare実作成試験へ進む
+
+## シナリオ手動登録UI dev反映確認（2026-06-24）
+
+対象：
+
+- dev Admin Pages：`line-harness-custom-dev-admin-fb2091b6`
+- dev Worker：`https://line-harness-custom-dev.x-picard1701.workers.dev`
+- 管理画面：`https://line-harness-custom-dev-admin-fb2091b6.pages.dev`
+- 対象シナリオ：`テストシナリオ２`
+- 対象友だち：`KAZU@KOKE`
+
+実施内容：
+
+- `NEXT_PUBLIC_API_URL=https://line-harness-custom-dev.x-picard1701.workers.dev pnpm --filter web build` 成功。
+- `wrangler pages deploy out --project-name line-harness-custom-dev-admin-fb2091b6 --branch main --commit-dirty=true` でdev Admin Pagesへ反映。
+- dev Workerの再deployは未実施。既存の `POST /api/scenarios/:id/enroll/:friendId` APIを利用。
+- dev管理画面のシナリオ詳細で「友だちを登録」UIが表示されることを確認。
+- 友だち検索欄で `KAZU` を検索し、`KAZU@KOKE` を選択できることを確認。
+- `テストシナリオ２` に `KAZU@KOKE` を手動登録できることを確認。
+- 登録後、画面上で `登録 1 人 / 進行中 1 人` とstatsが再取得されることを確認。
+- 同じ友だちを再登録した場合、`この友だちは既にこのシナリオに登録済みです` と表示されることを確認。
+- dev D1で `friend_scenarios` に `テストシナリオ２` x `KAZU@KOKE` の登録が作成されたことを確認。
+- 5分cron後、`messages_log` に `source = scenario`、本文 `これはテスト配信２です。` の送信ログが作成され、`friend_scenarios.status = completed` になったことを確認。
+
+安全確認：
+
+- 本番Cloudflare、本番LINE、npm publishは未実施。
+- dev反映作業時点ではcommit未実施。後続の差分整理でローカルcommitした。
+- 今回対象外の既存差分（auth/middleware/vite系、`docs/LINE-Harness-oss-Custom.code-workspace`）は変更していない。
 
 ## 友だちタグ付与・解除API整備（2026-06-25）
 

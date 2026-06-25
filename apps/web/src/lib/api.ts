@@ -3,6 +3,7 @@ import type {
   Tag,
   Scenario,
   ScenarioStep,
+  FriendScenario,
   ApiResponse,
   PaginatedResponse,
   User,
@@ -294,6 +295,10 @@ export const api = {
         paused: number
         steps: Array<{ stepOrder: number; reachedCount: number; reachRate: number }>
       }>>(`/api/scenarios/${id}/stats`),
+    enroll: (id: string, friendId: string) =>
+      fetchApi<ApiResponse<FriendScenario>>(`/api/scenarios/${id}/enroll/${friendId}`, {
+        method: 'POST',
+      }),
   },
   broadcasts: {
     list: (params?: { accountId?: string }) => {
